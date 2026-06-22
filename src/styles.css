@@ -147,6 +147,7 @@
     /* heights */
     --vf-h-hero: clamp(280px, 72cqw, 420px);
     --vf-h-card: clamp(96px, 32cqw, 158px);
+    --vf-start-section-gap: var(--vf-sp-24);
     /* Configuring Generation hero — Figma 723:3180 */
     --vf-h-configuring-hero: clamp(200px, 73.3cqw, 275px);
 
@@ -312,6 +313,39 @@
 
 .vf-pt-safe {
   padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Start-page: один скролл, без sticky-footer (iOS SE/15) */
+.vf-start-scroll {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vf-start-footer-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vf-sp-12);
+  padding-inline: var(--vf-sp-12);
+  padding-top: var(--vf-sp-16);
+  padding-bottom: max(var(--vf-sp-20), env(safe-area-inset-bottom, 0px));
+  background-color: var(--vf-surface);
+}
+
+@media (max-height: 740px) {
+  [data-vf-root] .vf-start-page {
+    --vf-h-card: clamp(72px, 26cqw, 120px);
+    --vf-start-section-gap: var(--vf-sp-16);
+  }
+}
+
+@media (max-height: 640px) {
+  [data-vf-root] .vf-start-page {
+    --vf-h-card: clamp(64px, 24cqw, 100px);
+    --vf-start-section-gap: var(--vf-sp-12);
+  }
 }
 
 /* Hero overlay rails — fluid от токенов виджета */

@@ -149,7 +149,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
     <div
       data-vf-root
       data-vf-theme={effectiveTheme}
-      className="relative flex flex-col overflow-hidden w-full h-[100dvh] rounded-none shadow-none sm:w-[375px] sm:h-[812px] sm:rounded-[var(--vf-radius-widget)] sm:shadow-[var(--vf-shadow-widget)]"
+      className="relative flex flex-col overflow-hidden w-full flex-1 min-h-0 sm:flex-none sm:w-[375px] sm:h-[812px] sm:rounded-[var(--vf-radius-widget)] sm:shadow-[var(--vf-shadow-widget)]"
       style={{
         ...cssVars,
         backgroundColor: "var(--vf-surface)",
