@@ -3,6 +3,7 @@ import { useWidgetConfig } from "@/widget/config";
 import type { ProfilePhotoSlotId } from "@/widget/config";
 import { useResolvedUploadExamples } from "@/widget/config/useResolvedUploadExamples";
 import { PoweredByFooter } from "../PoweredByFooter";
+import { AnimatedSheetShell } from "@/components/widget/ui/AnimatedSheetShell";
 import {
   UploadTipsExamplesGrid,
   UploadTipsList,
@@ -51,145 +52,120 @@ export function InfoModal({
     if (open) setView("examples");
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose?.();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={title}
-      className="absolute inset-0 z-30 flex flex-col min-h-0"
-      style={{ fontFamily: "var(--vf-font-body)" }}
+    <AnimatedSheetShell
+      open={open}
+      onClose={() => onClose?.()}
+      ariaLabel={title}
+      panelStyle={{
+        backgroundColor: "var(--vf-surface)",
+        borderTopLeftRadius: "var(--vf-radius-widget)",
+        borderTopRightRadius: "var(--vf-radius-widget)",
+        maxHeight: "78%",
+        boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
+      }}
     >
-      <button
-        type="button"
-        aria-label={c.close}
-        onClick={onClose}
-        className="absolute inset-0 w-full h-full"
-        style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
+      <div
+        className="flex items-center justify-center shrink-0"
+        style={{ paddingTop: 10, paddingBottom: 6 }}
+      >
+        <span
+          aria-hidden
+          style={{
+            width: 36,
+            height: 4,
+            borderRadius: 999,
+            backgroundColor: "color-mix(in oklab, var(--vf-text) 18%, transparent)",
+          }}
+        />
+      </div>
+
+      <h2
+        className="uppercase text-center shrink-0"
+        style={{
+          fontFamily: "var(--vf-font-heading)",
+          fontWeight: 700,
+          fontSize: "var(--vf-fs-22)",
+          lineHeight: 1.15,
+          letterSpacing: "0.02em",
+          color: "var(--vf-text)",
+          paddingInline: "var(--vf-sp-20)",
+          paddingBottom: "var(--vf-sp-12)",
+        }}
+      >
+        {slotId === "fullHeight" ? renderBalancedTitle(title) : title}
+      </h2>
+
+      <div
+        className="h-px w-full shrink-0"
+        style={{
+          backgroundColor: "color-mix(in oklab, var(--vf-text) 10%, transparent)",
+        }}
       />
 
       <div
-        className="relative mt-auto flex flex-col w-full min-w-0"
+        className="flex-1 min-h-0 overflow-y-auto"
         style={{
-          backgroundColor: "var(--vf-surface)",
-          borderTopLeftRadius: "var(--vf-radius-widget)",
-          borderTopRightRadius: "var(--vf-radius-widget)",
-          maxHeight: "78%",
-          boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
+          paddingInline: "var(--vf-sp-20)",
+          paddingTop: "var(--vf-sp-16)",
+          paddingBottom: "var(--vf-sp-12)",
         }}
       >
-        <div
-          className="flex items-center justify-center shrink-0"
-          style={{ paddingTop: 10, paddingBottom: 6 }}
-        >
-          <span
-            aria-hidden
-            style={{
-              width: 36,
-              height: 4,
-              borderRadius: 999,
-              backgroundColor: "color-mix(in oklab, var(--vf-text) 18%, transparent)",
-            }}
-          />
-        </div>
-
-        <h2
-          className="uppercase text-center shrink-0"
+        <p
           style={{
-            fontFamily: "var(--vf-font-heading)",
-            fontWeight: 700,
-            fontSize: "var(--vf-fs-22)",
-            lineHeight: 1.15,
-            letterSpacing: "0.02em",
+            fontSize: "var(--vf-fs-13)",
+            fontWeight: 400,
+            lineHeight: 1.4,
+            color: "color-mix(in oklab, var(--vf-text) 75%, transparent)",
+            marginBottom: "var(--vf-sp-16)",
+          }}
+        >
+          {ud.subtitle}
+        </p>
+
+        {view === "examples" ? (
+          <UploadTipsExamplesGrid good={examples.good} bad={examples.bad} />
+        ) : (
+          <UploadTipsList tips={tips} />
+        )}
+
+        <button
+          type="button"
+          onClick={() => setView((v) => (v === "examples" ? "tips" : "examples"))}
+          className="self-start text-left underline underline-offset-2 transition-opacity hover:opacity-80"
+          style={{
+            display: "inline-block",
+            marginTop: "var(--vf-sp-16)",
+            fontFamily: "var(--vf-font-body)",
+            fontSize: "var(--vf-fs-13)",
+            fontWeight: 500,
             color: "var(--vf-text)",
-            paddingInline: "var(--vf-sp-20)",
-            paddingBottom: "var(--vf-sp-12)",
+            background: "transparent",
           }}
         >
-          {slotId === "fullHeight" ? renderBalancedTitle(title) : title}
-        </h2>
-
-        <div
-          className="h-px w-full shrink-0"
-          style={{
-            backgroundColor: "color-mix(in oklab, var(--vf-text) 10%, transparent)",
-          }}
-        />
-
-        <div
-          className="flex-1 min-h-0 overflow-y-auto"
-          style={{
-            paddingInline: "var(--vf-sp-20)",
-            paddingTop: "var(--vf-sp-16)",
-            paddingBottom: "var(--vf-sp-12)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "var(--vf-fs-13)",
-              fontWeight: 400,
-              lineHeight: 1.4,
-              color: "color-mix(in oklab, var(--vf-text) 75%, transparent)",
-              marginBottom: "var(--vf-sp-16)",
-            }}
-          >
-            {ud.subtitle}
-          </p>
-
-          {view === "examples" ? (
-            <UploadTipsExamplesGrid good={examples.good} bad={examples.bad} />
-          ) : (
-            <UploadTipsList tips={tips} />
-          )}
-
-          <button
-            type="button"
-            onClick={() => setView((v) => (v === "examples" ? "tips" : "examples"))}
-            className="self-start text-left underline underline-offset-2"
-            style={{
-              display: "inline-block",
-              marginTop: "var(--vf-sp-16)",
-              fontFamily: "var(--vf-font-body)",
-              fontSize: "var(--vf-fs-13)",
-              fontWeight: 500,
-              color: "var(--vf-text)",
-              background: "transparent",
-            }}
-          >
-            {view === "examples" ? ud.showTips : ud.hideTips}
-          </button>
-        </div>
-
-        <div
-          className="shrink-0"
-          style={{
-            paddingInline: "var(--vf-sp-20)",
-            paddingTop: "var(--vf-sp-12)",
-            paddingBottom: "var(--vf-sp-8)",
-          }}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full text-xs font-bold uppercase tracking-wide"
-            style={primaryButtonStyle(true)}
-          >
-            {c.ok}
-          </button>
-        </div>
-
-        <PoweredByFooter />
+          {view === "examples" ? ud.showTips : ud.hideTips}
+        </button>
       </div>
-    </div>
+
+      <div
+        className="shrink-0"
+        style={{
+          paddingInline: "var(--vf-sp-20)",
+          paddingTop: "var(--vf-sp-12)",
+          paddingBottom: "var(--vf-sp-8)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full text-xs font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
+          style={primaryButtonStyle(true)}
+        >
+          {c.ok}
+        </button>
+      </div>
+
+      <PoweredByFooter />
+    </AnimatedSheetShell>
   );
 }

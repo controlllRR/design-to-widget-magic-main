@@ -1,6 +1,7 @@
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import { PoweredByFooter } from "@/components/widget/PoweredByFooter";
+import { AnimatedSheetShell } from "@/components/widget/ui/AnimatedSheetShell";
 
 export type BottomSheetSize = "compact" | "medium" | "tall" | "auto";
 
@@ -41,18 +42,7 @@ export function BottomSheet({
   scrollBody = false,
   showPoweredBy = true,
 }: BottomSheetProps) {
-  const { t } = useWidgetConfig();
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
+  useWidgetConfig();
 
   const titleStyle =
     titleVariant === "dialog"
@@ -73,71 +63,57 @@ export function BottomSheet({
         };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={ariaLabel}
-      className="absolute inset-0 z-50 flex flex-col"
-      style={{ fontFamily: "var(--vf-font-body)" }}
+    <AnimatedSheetShell
+      open={open}
+      onClose={onClose}
+      ariaLabel={ariaLabel}
+      panelStyle={{
+        backgroundColor: "var(--vf-surface)",
+        borderTopLeftRadius: "var(--vf-radius-widget)",
+        borderTopRightRadius: "var(--vf-radius-widget)",
+        maxHeight: size === "auto" ? undefined : SIZE_MAX_HEIGHT[size],
+        boxShadow: "0 -4px 18px rgba(0,0,0,0.12)",
+      }}
     >
-      <button
-        type="button"
-        aria-label={t.screens.common.close}
-        onClick={onClose}
-        className="absolute inset-0 w-full h-full"
-        style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      />
-
-      <div
-        className="relative mt-auto flex flex-col w-full min-w-0"
-        style={{
-          backgroundColor: "var(--vf-surface)",
-          borderTopLeftRadius: "var(--vf-radius-widget)",
-          borderTopRightRadius: "var(--vf-radius-widget)",
-          maxHeight: size === "auto" ? undefined : SIZE_MAX_HEIGHT[size],
-          boxShadow: "0 -4px 18px rgba(0,0,0,0.12)",
-        }}
-      >
-        <div className="flex items-center justify-center shrink-0" style={{ paddingTop: 10, paddingBottom: 6 }}>
-          <span
-            aria-hidden
-            style={{
-              width: 48,
-              height: 3,
-              borderRadius: 999,
-              backgroundColor: "#acafb5",
-            }}
-          />
-        </div>
-
-        {title != null && (
-          <div
-            className="text-center shrink-0"
-            style={{
-              paddingInline: "var(--vf-sp-20)",
-              paddingBottom: titleVariant === "dialog" ? "var(--vf-sp-12)" : "var(--vf-sp-16)",
-            }}
-          >
-            <h2 style={{ ...titleStyle, color: "var(--vf-text)" }}>{title}</h2>
-          </div>
-        )}
-
-        {children != null &&
-          (scrollBody ? (
-            <div
-              className="flex-1 min-h-0 overflow-y-auto"
-              style={{ paddingInline: "var(--vf-sp-20)", paddingBottom: "var(--vf-sp-12)" }}
-            >
-              {children}
-            </div>
-          ) : (
-            <div style={{ paddingInline: "var(--vf-sp-20)", paddingBottom: "var(--vf-sp-12)" }}>{children}</div>
-          ))}
-
-        {footer}
-
-        {showPoweredBy && <PoweredByFooter />}
+      <div className="flex items-center justify-center shrink-0" style={{ paddingTop: 10, paddingBottom: 6 }}>
+        <span
+          aria-hidden
+          style={{
+            width: 48,
+            height: 3,
+            borderRadius: 999,
+            backgroundColor: "#acafb5",
+          }}
+        />
       </div>
-    </div>
+
+      {title != null && (
+        <div
+          className="text-center shrink-0"
+          style={{
+            paddingInline: "var(--vf-sp-20)",
+            paddingBottom: titleVariant === "dialog" ? "var(--vf-sp-12)" : "var(--vf-sp-16)",
+          }}
+        >
+          <h2 style={{ ...titleStyle, color: "var(--vf-text)" }}>{title}</h2>
+        </div>
+      )}
+
+      {children != null &&
+        (scrollBody ? (
+          <div
+            className="flex-1 min-h-0 overflow-y-auto"
+            style={{ paddingInline: "var(--vf-sp-20)", paddingBottom: "var(--vf-sp-12)" }}
+          >
+            {children}
+          </div>
+        ) : (
+          <div style={{ paddingInline: "var(--vf-sp-20)", paddingBottom: "var(--vf-sp-12)" }}>{children}</div>
+        ))}
+
+      {footer}
+
+      {showPoweredBy && <PoweredByFooter />}
+    </AnimatedSheetShell>
   );
 }

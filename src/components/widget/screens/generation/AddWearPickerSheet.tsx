@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
+import { AnimatedSheetShell } from "@/components/widget/ui/AnimatedSheetShell";
 import { SegmentedTabs } from "@/components/widget/ui/SegmentedTabs";
 import { useHorizontalScrollGestures } from "@/lib/useHorizontalScrollGestures";
 import type { AddWearItem, AddWearTab } from "./addWearCatalog";
@@ -54,16 +55,7 @@ export function AddWearPickerSheet<T extends string>({
     setSelectedId(preset);
   }, [activeTab, tabs]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open || !defaultTab) return null;
+  if (!defaultTab) return null;
 
   const tabItems = tabs.map((tab) => ({
     id: tab.id,
@@ -77,112 +69,98 @@ export function AddWearPickerSheet<T extends string>({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={title}
-      className="absolute inset-0 z-50 flex flex-col"
-      style={{ fontFamily: "var(--vf-font-body)" }}
+    <AnimatedSheetShell
+      open={open}
+      onClose={onClose}
+      ariaLabel={title}
+      panelStyle={{
+        backgroundColor: "var(--vf-surface)",
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        boxShadow: "0 -4px 18px rgba(0,0,0,0.12)",
+        minHeight: 258,
+      }}
     >
-      <button
-        type="button"
-        aria-label={t.screens.common.close}
-        onClick={onClose}
-        className="absolute inset-0 w-full h-full"
-        style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      />
-
       <div
-        className="relative mt-auto flex flex-col w-full min-w-0"
+        className="flex items-center justify-center shrink-0"
+        style={{ paddingTop: 10, paddingBottom: 6 }}
+      >
+        <span
+          aria-hidden
+          style={{
+            width: 48,
+            height: 1,
+            backgroundColor: "color-mix(in oklab, var(--vf-text) 18%, transparent)",
+          }}
+        />
+      </div>
+
+      <h2
+        className="text-center uppercase shrink-0"
         style={{
-          backgroundColor: "var(--vf-surface)",
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
-          boxShadow: "0 -4px 18px rgba(0,0,0,0.12)",
-          minHeight: 258,
+          paddingInline: 20,
+          paddingBottom: 12,
+          fontFamily: "var(--vf-font-heading)",
+          fontWeight: 700,
+          fontSize: "var(--vf-fs-14)",
+          lineHeight: 1.2,
+          letterSpacing: "-0.02em",
+          color: "var(--vf-text)",
         }}
       >
-        <div
-          className="flex items-center justify-center shrink-0"
-          style={{ paddingTop: 10, paddingBottom: 6 }}
-        >
-          <span
-            aria-hidden
-            style={{
-              width: 48,
-              height: 1,
-              backgroundColor: "color-mix(in oklab, var(--vf-text) 18%, transparent)",
-            }}
-          />
-        </div>
+        {title}
+      </h2>
 
-        <h2
-          className="text-center uppercase shrink-0"
-          style={{
-            paddingInline: 20,
-            paddingBottom: 12,
-            fontFamily: "var(--vf-font-heading)",
-            fontWeight: 700,
-            fontSize: "var(--vf-fs-14)",
-            lineHeight: 1.2,
-            letterSpacing: "-0.02em",
-            color: "var(--vf-text)",
-          }}
-        >
-          {title}
-        </h2>
-
-        <div className="shrink-0" style={{ paddingInline: 20, paddingBottom: 12 }}>
-          <SegmentedTabs
-            items={tabItems}
-            value={activeTab}
-            onChange={setActiveTab}
-            variant="inverted"
-            size="sm"
-            ariaLabel={title}
-          />
-        </div>
-
-        <div
-          ref={itemsScrollRef}
-          className="flex gap-3 overflow-x-auto min-w-0 shrink-0 vf-h-scroll"
-          style={{
-            paddingInline: 20,
-            paddingBottom: 20,
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          {activeItems.map((item) => {
-            const active = selectedId === item.id;
-            const src = ADD_WEAR_ICONS[item.id];
-            return (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => pickItem(item)}
-                className="shrink-0 flex items-center justify-center"
-                style={{
-                  width: 86,
-                  height: 86,
-                  borderRadius: 12,
-                  backgroundColor: active ? "#343537" : "transparent",
-                }}
-              >
-                {src ? (
-                  <img
-                    src={src}
-                    alt=""
-                    draggable={false}
-                    className="object-contain"
-                    style={{ width: 62, height: 62 }}
-                  />
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+      <div className="shrink-0" style={{ paddingInline: 20, paddingBottom: 12 }}>
+        <SegmentedTabs
+          items={tabItems}
+          value={activeTab}
+          onChange={setActiveTab}
+          variant="inverted"
+          size="sm"
+          ariaLabel={title}
+        />
       </div>
-    </div>
+
+      <div
+        ref={itemsScrollRef}
+        className="flex gap-3 overflow-x-auto min-w-0 shrink-0 vf-h-scroll"
+        style={{
+          paddingInline: 20,
+          paddingBottom: 20,
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {activeItems.map((item) => {
+          const active = selectedId === item.id;
+          const src = ADD_WEAR_ICONS[item.id];
+          return (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => pickItem(item)}
+              className="shrink-0 flex items-center justify-center vf-segment-pill"
+              style={{
+                width: 86,
+                height: 86,
+                borderRadius: 12,
+                backgroundColor: active ? "#343537" : "transparent",
+              }}
+            >
+              {src ? (
+                <img
+                  src={src}
+                  alt=""
+                  draggable={false}
+                  className="object-contain"
+                  style={{ width: 62, height: 62 }}
+                />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    </AnimatedSheetShell>
   );
 }

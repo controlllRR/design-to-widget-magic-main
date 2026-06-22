@@ -159,6 +159,10 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
       <UserMenuPinsProvider>
       <UserMenuNavProvider onSelect={handleMenuSelect}>
       <div className="relative flex flex-1 flex-col min-h-0 min-w-0 w-full">
+      <div
+        key={screen}
+        className="vf-screen-enter flex flex-col flex-1 min-h-0 min-w-0 w-full overflow-hidden"
+      >
       {screen === "splash" && (
         <SplashScreen onStart={() => navigate("start-page")} />
       )}
@@ -421,6 +425,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
           onClose={() => navigate("start-page")}
         />
       )}
+      </div>
 
       <WarningModal
         open={(warningOpen || screen === "popup-warning") && !generationLoading}

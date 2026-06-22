@@ -64,7 +64,7 @@ export function SegmentedTabs<T extends string>({
               aria-selected={active}
               disabled={it.disabled}
               onClick={() => onChange(it.id)}
-              className="flex items-center justify-center min-w-0 transition-colors lowercase"
+              className="flex items-center justify-center min-w-0 vf-segment-pill lowercase"
               style={style}
             >
               <span className="truncate px-2">{it.label}</span>
@@ -97,7 +97,7 @@ export function SegmentedTabs<T extends string>({
               aria-selected={active}
               disabled={it.disabled}
               onClick={() => onChange(it.id)}
-              className="relative shrink-0 transition-opacity"
+              className="relative shrink-0 vf-segment-pill"
               style={{
                 paddingBlock: "var(--vf-sp-8)",
                 fontFamily: "var(--vf-font-body)",
@@ -159,7 +159,7 @@ export function SegmentedTabs<T extends string>({
             aria-selected={active}
             disabled={it.disabled}
             onClick={() => onChange(it.id)}
-            className="flex items-center justify-center min-w-0 transition-colors"
+            className="flex items-center justify-center min-w-0 vf-segment-pill"
             style={style}
           >
             <span className="truncate px-2">{it.label}</span>

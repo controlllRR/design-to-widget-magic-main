@@ -1,10 +1,10 @@
-﻿import { useEffect } from "react";
-import { useWidgetConfig } from "@/widget/config";
+﻿import { useWidgetConfig } from "@/widget/config";
 import type { MeasureGuideKey } from "@/widget/config/measure-guide-images";
 import {
   resolveMeasureGuideCard,
   SIZE_CHART_LEG_LENGTH_CARD,
 } from "@/widget/config/measure-guide-images";
+import { AnimatedSheetShell } from "@/components/widget/ui/AnimatedSheetShell";
 import { Watermark } from "../Watermark";
 
 export type ProfileHelpSheetKind =
@@ -29,74 +29,53 @@ export function ProfileHelpSheet({
 }: ProfileHelpSheetProps) {
   const { t } = useWidgetConfig();
   const t_cp = t.createProfile;
-
-  useEffect(() => {
-    if (!kind) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [kind, onClose]);
-
-  if (!kind) return null;
+  const open = kind !== null;
 
   const measureCard =
-    kind.type === "measure"
+    kind?.type === "measure"
       ? resolveMeasureGuideCard(kind.fieldId, gender)
       : undefined;
 
   const ariaLabel =
-    kind.type === "sizeChart"
+    kind?.type === "sizeChart"
       ? t_cp.legLengthSizeChart.title
-      : (t_cp.measureGuides[kind.fieldId as keyof typeof t_cp.measureGuides]
-          ?.title ?? t_cp.howToMeasure);
+      : kind?.type === "measure"
+        ? (t_cp.measureGuides[kind.fieldId as keyof typeof t_cp.measureGuides]?.title ??
+          t_cp.howToMeasure)
+        : t_cp.howToMeasure;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={ariaLabel}
-      className="absolute inset-0 z-50 flex flex-col"
-      style={{ fontFamily: "var(--vf-font-body)" }}
+    <AnimatedSheetShell
+      open={open}
+      onClose={onClose}
+      ariaLabel={ariaLabel}
+      panelStyle={{
+        backgroundColor: "var(--vf-surface)",
+        borderTopLeftRadius: "var(--vf-radius-widget)",
+        borderTopRightRadius: "var(--vf-radius-widget)",
+        maxHeight: "88%",
+        boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
+      }}
+      panelClassName="overflow-hidden"
     >
-      <button
-        type="button"
-        aria-label="Закрыть"
-        onClick={onClose}
-        className="absolute inset-0 w-full h-full"
-        style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      />
-
-      <div
-        className="relative mt-auto flex flex-col w-full min-w-0 overflow-hidden"
-        style={{
-          backgroundColor: "var(--vf-surface)",
-          borderTopLeftRadius: "var(--vf-radius-widget)",
-          borderTopRightRadius: "var(--vf-radius-widget)",
-          maxHeight: "88%",
-          boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
-        }}
-      >
-        <div className="flex-1 overflow-y-auto min-h-0">
-          {kind.type === "measure" && measureCard ? (
-            <img
-              src={measureCard}
-              alt=""
-              className="block w-full h-auto max-w-[411px] mx-auto"
-              draggable={false}
-              decoding="async"
-            />
-          ) : kind.type === "measure" ? (
-            <MeasureGuideFallback fieldId={kind.fieldId} />
-          ) : (
-            <LegLengthSizeChart onHowToMeasure={() => onOpenMeasure?.("legLength")} />
-          )}
-        </div>
-
-        <Watermark />
+      <div className="flex-1 overflow-y-auto min-h-0">
+        {kind?.type === "measure" && measureCard ? (
+          <img
+            src={measureCard}
+            alt=""
+            className="block w-full h-auto max-w-[411px] mx-auto"
+            draggable={false}
+            decoding="async"
+          />
+        ) : kind?.type === "measure" && kind ? (
+          <MeasureGuideFallback fieldId={kind.fieldId} />
+        ) : kind?.type === "sizeChart" ? (
+          <LegLengthSizeChart onHowToMeasure={() => onOpenMeasure?.("legLength")} />
+        ) : null}
       </div>
-    </div>
+
+      <Watermark />
+    </AnimatedSheetShell>
   );
 }
 

@@ -186,7 +186,7 @@ export function CatalogPriceRange({
           aria-hidden
         />
         <div
-          className="absolute rounded-full pointer-events-none"
+          className="absolute rounded-full pointer-events-none vf-slider-fill"
           style={{
             top: "50%",
             transform: "translateY(-50%)",
@@ -204,7 +204,7 @@ export function CatalogPriceRange({
           aria-valuemin={CATALOG_PRICE_MIN}
           aria-valuemax={safeMax}
           aria-valuenow={safeMin}
-          className="absolute rounded-full p-0 border-0"
+          className="absolute rounded-full p-0 border-0 vf-slider-thumb"
           style={{
             top: "50%",
             left: `${leftPct}%`,
@@ -246,7 +246,7 @@ export function CatalogPriceRange({
           aria-valuemin={safeMin}
           aria-valuemax={CATALOG_PRICE_MAX}
           aria-valuenow={safeMax}
-          className="absolute rounded-full p-0 border-0"
+          className="absolute rounded-full p-0 border-0 vf-slider-thumb"
           style={{
             top: "50%",
             left: `${rightPct}%`,
