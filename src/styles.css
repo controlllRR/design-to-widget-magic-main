@@ -1,0 +1,312 @@
+@import "tailwindcss" source(none);
+@source "../src";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  /*
+   * Fluid scale tokens для виджета виртуальной примерки.
+   * Базовый дизайн в Figma — 375px. Минимальная поддерживаемая ширина — 320px.
+   * Все размеры скейлятся через clamp(); на >=375px — фиксируются на базовом.
+   * Виджет на мобильных растягивается на всю ширину экрана, на десктопе — 375px.
+   */
+  [data-vf-root] {
+    /* spacing */
+    --vf-sp-2: clamp(2px, 0.55vw, 2px);
+    --vf-sp-4: clamp(3px, 1.1vw, 4px);
+    --vf-sp-6: clamp(5px, 1.65vw, 6px);
+    --vf-sp-8: clamp(7px, 2.2vw, 8px);
+    --vf-sp-10: clamp(8px, 2.7vw, 10px);
+    --vf-sp-12: clamp(10px, 3.3vw, 12px);
+    --vf-sp-14: clamp(12px, 3.85vw, 14px);
+    --vf-sp-16: clamp(14px, 4.4vw, 16px);
+    --vf-sp-20: clamp(17px, 5.5vw, 20px);
+    --vf-sp-24: clamp(20px, 6.6vw, 24px);
+    --vf-sp-28: clamp(24px, 7.7vw, 28px);
+    --vf-sp-32: clamp(27px, 8.8vw, 32px);
+
+    /* control sizes */
+    --vf-sz-22: clamp(19px, 6vw, 22px);
+    --vf-sz-24: clamp(20px, 6.5vw, 24px);
+    --vf-sz-44: clamp(38px, 11.7vw, 44px);
+    --vf-sz-46: clamp(40px, 12.3vw, 46px);
+    --vf-sz-52: clamp(44px, 13.9vw, 52px);
+    /* Плитки силуэтов (телосложение, грудь, живот…) — одинаковый размер независимо от числа вариантов */
+    --vf-sz-shape-tile: clamp(48px, 14vw, 60px);
+
+    /* font sizes */
+    --vf-fs-10: clamp(9px, 2.7vw, 10px);
+    --vf-fs-12: clamp(11px, 3.3vw, 12px);
+    --vf-fs-13: clamp(12px, 3.55vw, 13px);
+    --vf-fs-14: clamp(13px, 3.85vw, 14px);
+    --vf-fs-16: clamp(14px, 4.4vw, 16px);
+    --vf-fs-22: clamp(19px, 6vw, 22px);
+    --vf-fs-26: clamp(22px, 7.1vw, 26px);
+
+    /* heights */
+    --vf-h-hero: clamp(360px, 56dvh, 420px);
+    --vf-h-card: clamp(140px, 42vw, 158px);
+    /* Configuring Generation hero — Figma 723:3180 */
+    --vf-h-configuring-hero: clamp(234px, 73.3vw, 275px);
+
+    /* selection tiles — тот же primary, что у размеров одежды (Figma 674:4976) */
+    --vf-tile-selected-bg: var(--vf-primary);
+    --vf-tile-selected-border: var(--vf-primary);
+  }
+}
+
+/* ===== Анимации логотипа магазина-хоста ===== */
+@keyframes vf-logo-fadeIn {
+  from { opacity: 0; }
+  to   { opacity: var(--vf-logo-final-opacity, 0.85); }
+}
+@keyframes vf-logo-slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: translateY(0); }
+}
+@keyframes vf-logo-scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: scale(1); }
+}
+@keyframes vf-logo-rotateIn {
+  from { opacity: 0; transform: rotate(-8deg) scale(0.9); }
+  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: rotate(0) scale(1); }
+}
+@keyframes vf-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes vf-logo-pulse {
+  0%, 100% { opacity: var(--vf-logo-final-opacity, 0.85); }
+  50%      { opacity: 1; }
+}
+@keyframes vf-logo-shimmer {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+
+@keyframes vf-shimmer-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.85; }
+}
+
+.vf-shimmer-block {
+  animation: vf-shimmer-pulse 1.4s ease-in-out infinite;
+}
+
+.vf-logo {
+  opacity: var(--vf-logo-final-opacity, 0.85);
+  will-change: transform, opacity;
+}
+.vf-logo-anim-fadeIn    { animation: vf-logo-fadeIn 0.9s ease-out both; }
+.vf-logo-anim-slideDown { animation: vf-logo-slideDown 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+.vf-logo-anim-scaleIn   { animation: vf-logo-scaleIn 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+.vf-logo-anim-rotateIn  { animation: vf-logo-rotateIn 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+.vf-logo-anim-float     { animation: vf-logo-float 3.6s ease-in-out infinite; }
+.vf-logo-anim-pulse     { animation: vf-logo-pulse 2.4s ease-in-out infinite; }
+.vf-logo-anim-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.vf-logo-anim-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: vf-logo-shimmer 2.6s ease-in-out infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vf-logo-anim-fadeIn,
+  .vf-logo-anim-slideDown,
+  .vf-logo-anim-scaleIn,
+  .vf-logo-anim-rotateIn,
+  .vf-logo-anim-float,
+  .vf-logo-anim-pulse { animation: none; }
+  .vf-logo-anim-shimmer::after { animation: none; opacity: 0; }
+}
+
+/* Скрытый скроллбар для горизонтальных пикеров размеров */
+.vf-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.vf-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Горизонтальные пикеры: drag-scroll на desktop (см. useHorizontalScrollGestures). */
+.vf-h-scroll {
+  cursor: grab;
+  touch-action: pan-x;
+}
+.vf-h-scroll.vf-h-scroll-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+.vf-h-scroll button {
+  cursor: inherit;
+}
+.vf-h-scroll.vf-h-scroll-dragging button {
+  cursor: grabbing;
+}
+
+/*
+ * Overlay-scroll: ползунок виден только во время прокрутки (desktop ≈ mobile).
+ * Класс vf-is-scrolling выставляется в useAutoHideScrollbars.
+ */
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  ) {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  ).vf-is-scrolling {
+  scrollbar-color: color-mix(in oklab, var(--vf-text, oklch(0.35 0 0)) 32%, transparent)
+    transparent;
+}
+
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  )::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  )::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  )::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+  transition: background-color 0.35s ease;
+}
+
+:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
+    .vf-no-scrollbar
+  ).vf-is-scrolling::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--vf-text, oklch(0.35 0 0)) 32%, transparent);
+}
+
+/* TikTok Sans: применяем opsz=24 и width=ExtraExpanded (125) для всех заголовков виджета */
+[data-vf-root] {
+  font-optical-sizing: auto;
+}
+[data-vf-root] [style*="--vf-font-heading"] {
+  font-variation-settings: "opsz" 24, "wdth" 125;
+  font-stretch: 125%;
+}

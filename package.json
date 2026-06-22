@@ -1,0 +1,47 @@
+{
+  "name": "virtufit-widget",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "export:figma-refs": "node scripts/export-figma-refs.mjs",
+    "deploy": "npm run build && wrangler deploy --config dist/server/wrangler.json"
+  },
+  "dependencies": {
+    "@cloudflare/vite-plugin": "^1.25.5",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/react-router": "^1.168.0",
+    "@tanstack/react-start": "^1.167.14",
+    "@tanstack/router-plugin": "^1.167.10",
+    "lucide-react": "^0.575.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.2.1",
+    "vite-tsconfig-paths": "^6.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@lovable.dev/vite-tanstack-config": "^1.4.0",
+    "@types/node": "^22.16.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
+    "nitro": "3.0.260429-beta",
+    "wrangler": "^4.82.2",
+    "prettier": "^3.7.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^7.3.1"
+  }
+}
