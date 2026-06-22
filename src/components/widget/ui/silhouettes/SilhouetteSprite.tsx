@@ -107,8 +107,11 @@ export function SilhouetteSprite({
       ? FEMALE_ROW_LAYOUT[category]
       : MALE_ROW_LAYOUT[category];
   const cx = COL_CENTERS[Math.max(0, Math.min(4, index))];
-  const x = cx - ICON_W / 2;
-  const cropW = ICON_W;
+  // У «широких» бёдер силуэт шире и левый контур упирается в край окна кропа.
+  const cropShiftX = category === "hipsSize" && index === 4 ? -2 : 0;
+  const cropExtraW = category === "hipsSize" && index === 4 ? 4 : 0;
+  const x = cx - ICON_W / 2 + cropShiftX;
+  const cropW = ICON_W + cropExtraW;
   const cropY = layout.y + ICON_PAD_TOP;
   const cropH = ICON_H;
 

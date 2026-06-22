@@ -1,7 +1,7 @@
 import { Meh, X } from "lucide-react";
+import { useEffect } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import { PoweredByFooter } from "@/components/widget/PoweredByFooter";
-import { AnimatedSheetShell } from "@/components/widget/ui/AnimatedSheetShell";
 import { SegmentedTabs } from "@/components/widget/ui/SegmentedTabs";
 import { Slider } from "@/components/widget/ui/Slider";
 import type { OutfitItem } from "./data";
@@ -35,9 +35,20 @@ export function OutfitItemConfigSheet({
   const { t } = useWidgetConfig();
   const ic = t.screens.generation.itemConfig;
 
-  const fields = item ? (OUTFIT_ITEM_CONFIG_FIELDS[item.id] ?? []) : [];
-  const showSettings = item ? hasItemConfig(item.id) : false;
-  const configureLabel = item ? `${ic.configurePrefix} ${item.category.toLowerCase()}` : "";
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || !item) return null;
+
+  const fields = OUTFIT_ITEM_CONFIG_FIELDS[item.id] ?? [];
+  const showSettings = hasItemConfig(item.id);
+  const configureLabel = `${ic.configurePrefix} ${item.category.toLowerCase()}`;
 
   const setField = (fieldId: string, value: number | string) => {
     onChange({ ...values, [fieldId]: value });
@@ -50,20 +61,31 @@ export function OutfitItemConfigSheet({
   };
 
   return (
-    <AnimatedSheetShell
-      open={open && item !== null}
-      onClose={onClose}
-      ariaLabel={item?.name ?? ic.title}
-      panelStyle={{
-        backgroundColor: "var(--vf-surface)",
-        borderTopLeftRadius: "var(--vf-radius-widget)",
-        borderTopRightRadius: "var(--vf-radius-widget)",
-        maxHeight: "82%",
-        boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
-      }}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.name}
+      className="absolute inset-0 z-50 flex flex-col"
+      style={{ fontFamily: "var(--vf-font-body)" }}
     >
-      {!item ? null : (
-        <>
+      <button
+        type="button"
+        aria-label={t.screens.common.close}
+        onClick={onClose}
+        className="absolute inset-0 w-full h-full"
+        style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
+      />
+
+      <div
+        className="relative mt-auto flex flex-col w-full min-w-0"
+        style={{
+          backgroundColor: "var(--vf-surface)",
+          borderTopLeftRadius: "var(--vf-radius-widget)",
+          borderTopRightRadius: "var(--vf-radius-widget)",
+          maxHeight: "82%",
+          boxShadow: "0 -12px 32px -16px rgba(0,0,0,0.25)",
+        }}
+      >
         <div
           className="flex items-center justify-center shrink-0"
           style={{ paddingTop: 10, paddingBottom: 6 }}
@@ -195,9 +217,8 @@ export function OutfitItemConfigSheet({
         </div>
 
         <PoweredByFooter />
-        </>
-      )}
-    </AnimatedSheetShell>
+      </div>
+    </div>
   );
 }
 

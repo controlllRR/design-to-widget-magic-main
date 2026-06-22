@@ -52,7 +52,7 @@ export function StartPage({
         style={{ gridTemplateRows: "minmax(0, 1fr) auto" }}
       >
         <div
-          className="vf-start-scroll vf-scroll flex flex-col w-full min-w-0 min-h-0 overflow-y-auto"
+          className="vf-start-scroll flex flex-col w-full min-w-0 min-h-0 overflow-y-auto"
           style={{ gap: "var(--vf-start-section-gap)" }}
         >
         {/* Title */}

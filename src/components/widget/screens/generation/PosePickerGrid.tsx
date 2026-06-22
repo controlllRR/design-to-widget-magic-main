@@ -60,7 +60,7 @@ export function PosePickerGrid({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <div className="flex overflow-x-auto vf-no-scrollbar" style={{ gap: 4 }}>
+      <div className="flex overflow-x-auto" style={{ gap: 4 }}>
         {POSE_ROW_1.map((id) => (
           <PoseThumb
             key={id}
@@ -70,7 +70,7 @@ export function PosePickerGrid({
           />
         ))}
       </div>
-      <div className="flex overflow-x-auto vf-no-scrollbar" style={{ gap: 4 }}>
+      <div className="flex overflow-x-auto" style={{ gap: 4 }}>
         {POSE_ROW_2.map((id) => (
           <PoseThumb
             key={id}

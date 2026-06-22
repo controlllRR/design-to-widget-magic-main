@@ -66,7 +66,6 @@ export function SizePicker({
           gap: "var(--vf-sp-8)",
           scrollSnapType: "x mandatory",
           WebkitOverflowScrolling: "touch",
-          paddingBottom: 2,
         }}
       >
         {options.map((opt) => {

@@ -22,7 +22,7 @@ export function Toggle({ checked, onChange, label, ariaLabel }: ToggleProps) {
         aria-checked={checked}
         aria-label={ariaLabel}
         onClick={() => onChange(!checked)}
-        className="relative shrink-0 transition-colors duration-[var(--vf-anim-duration-fast)]"
+        className="relative shrink-0 transition-colors"
         style={{
           width: 36,
           height: 18,
@@ -34,7 +34,7 @@ export function Toggle({ checked, onChange, label, ariaLabel }: ToggleProps) {
       >
         <span
           aria-hidden
-          className="absolute top-1/2 -translate-y-1/2 rounded-full vf-toggle-knob"
+          className="absolute top-1/2 -translate-y-1/2 rounded-full transition-all"
           style={{
             left: checked ? 20 : 2,
             width: 14,

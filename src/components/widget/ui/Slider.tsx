@@ -52,7 +52,7 @@ export function Slider({
       />
       <div
         aria-hidden
-        className="absolute left-0 rounded-full vf-slider-fill"
+        className="absolute left-0 rounded-full"
         style={{
           top: "50%",
           transform: "translateY(-50%)",
@@ -63,7 +63,7 @@ export function Slider({
       />
       <div
         aria-hidden
-        className="absolute rounded-full pointer-events-none vf-slider-thumb"
+        className="absolute rounded-full pointer-events-none"
         style={{
           top: "50%",
           left: `${pct}%`,

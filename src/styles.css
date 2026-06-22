@@ -154,13 +154,6 @@
     /* selection tiles — тот же primary, что у размеров одежды (Figma 674:4976) */
     --vf-tile-selected-bg: var(--vf-primary);
     --vf-tile-selected-border: var(--vf-primary);
-
-    /* motion */
-    --vf-anim-duration: 280ms;
-    --vf-anim-duration-fast: 180ms;
-    --vf-anim-duration-screen: 320ms;
-    --vf-anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --vf-anim-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -243,12 +236,26 @@
   .vf-logo-anim-shimmer::after { animation: none; opacity: 0; }
 }
 
-/* Скрытый скроллбар для горизонтальных пикеров размеров */
-.vf-no-scrollbar {
+/* Без видимых ползунков — прокрутка жестами и колёсиком */
+:where(
+  .overflow-y-auto,
+  .overflow-x-auto,
+  .overflow-auto,
+  .vf-scroll,
+  .vf-start-scroll,
+  .vf-h-scroll
+) {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.vf-no-scrollbar::-webkit-scrollbar {
+:where(
+  .overflow-y-auto,
+  .overflow-x-auto,
+  .overflow-auto,
+  .vf-scroll,
+  .vf-start-scroll,
+  .vf-h-scroll
+)::-webkit-scrollbar {
   display: none;
 }
 
@@ -262,57 +269,12 @@
   user-select: none;
 }
 .vf-h-scroll button {
-  cursor: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 .vf-h-scroll.vf-h-scroll-dragging button {
   cursor: grabbing;
 }
-
-/*
- * Overlay-scroll: ползунок виден только во время прокрутки (desktop ≈ mobile).
- * Класс vf-is-scrolling выставляется в useAutoHideScrollbars.
- */
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  ) {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  ).vf-is-scrolling {
-  scrollbar-color: color-mix(in oklab, var(--vf-text, oklch(0.35 0 0)) 32%, transparent)
-    transparent;
-}
-
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  )::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  )::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  )::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  border-radius: 999px;
-  transition: background-color 0.35s ease;
-}
-
-:where(.overflow-y-auto, .overflow-x-auto, .overflow-auto, .vf-scroll):not(
-    .vf-no-scrollbar
-  ).vf-is-scrolling::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklab, var(--vf-text, oklch(0.35 0 0)) 32%, transparent);
-}
-
 /* Safe area (iOS notch / home indicator) */
 .vf-pb-safe {
   padding-bottom: max(var(--vf-sp-12), env(safe-area-inset-bottom, 0px));
@@ -420,141 +382,6 @@
 @container vf (max-width: 329px) {
   [data-vf-root] .vf-header-pin {
     display: none;
-  }
-}
-
-/* ===== UI motion: экраны, sheet, modal, ползунки ===== */
-
-.vf-screen-enter {
-  animation: vf-screen-enter var(--vf-anim-duration-screen) var(--vf-anim-ease) both;
-}
-
-.vf-anim-page-enter {
-  animation: vf-page-enter var(--vf-anim-duration-screen) var(--vf-anim-ease) both;
-}
-
-.vf-anim-backdrop {
-  opacity: 0;
-  transition: opacity var(--vf-anim-duration) var(--vf-anim-ease);
-}
-
-.vf-anim-backdrop--from,
-.vf-anim-backdrop--to {
-  opacity: 0;
-}
-
-.vf-anim-backdrop--active {
-  opacity: 1;
-}
-
-.vf-anim-sheet {
-  transform: translateY(100%);
-  transition: transform var(--vf-anim-duration) var(--vf-anim-ease);
-  will-change: transform;
-}
-
-.vf-anim-sheet--from,
-.vf-anim-sheet--to {
-  transform: translateY(100%);
-}
-
-.vf-anim-sheet--active {
-  transform: translateY(0);
-}
-
-.vf-anim-modal {
-  opacity: 0;
-  transform: scale(0.94) translateY(10px);
-  transition:
-    opacity var(--vf-anim-duration) var(--vf-anim-ease),
-    transform var(--vf-anim-duration) var(--vf-anim-ease);
-  will-change: opacity, transform;
-}
-
-.vf-anim-modal--from,
-.vf-anim-modal--to {
-  opacity: 0;
-  transform: scale(0.94) translateY(10px);
-}
-
-.vf-anim-modal--active {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-}
-
-.vf-anim-expand {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--vf-anim-duration) var(--vf-anim-ease);
-}
-
-.vf-anim-expand--open {
-  grid-template-rows: 1fr;
-}
-
-.vf-anim-expand-inner {
-  overflow: hidden;
-  min-height: 0;
-}
-
-.vf-slider-fill,
-.vf-slider-thumb {
-  transition:
-    left var(--vf-anim-duration-fast) var(--vf-anim-ease-out),
-    width var(--vf-anim-duration-fast) var(--vf-anim-ease-out),
-    transform var(--vf-anim-duration-fast) var(--vf-anim-ease-out);
-}
-
-.vf-segment-pill {
-  transition:
-    background-color var(--vf-anim-duration-fast) var(--vf-anim-ease),
-    color var(--vf-anim-duration-fast) var(--vf-anim-ease),
-    opacity var(--vf-anim-duration-fast) var(--vf-anim-ease);
-}
-
-.vf-toggle-knob {
-  transition:
-    left var(--vf-anim-duration-fast) var(--vf-anim-ease),
-    background-color var(--vf-anim-duration-fast) var(--vf-anim-ease);
-}
-
-@keyframes vf-screen-enter {
-  from {
-    opacity: 0;
-    transform: translateX(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes vf-page-enter {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .vf-screen-enter,
-  .vf-anim-page-enter {
-    animation: none;
-  }
-
-  .vf-anim-backdrop,
-  .vf-anim-sheet,
-  .vf-anim-modal,
-  .vf-anim-expand,
-  .vf-slider-fill,
-  .vf-slider-thumb,
-  .vf-segment-pill,
-  .vf-toggle-knob {
-    transition: none !important;
   }
 }
 

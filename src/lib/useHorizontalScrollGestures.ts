@@ -1,10 +1,22 @@
 import { useEffect, type RefObject } from "react";
 
-const DRAG_THRESHOLD_PX = 4;
+const DRAG_THRESHOLD_PX = 6;
+
+function isInteractiveScrollTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  return Boolean(
+    target.closest(
+      'button, a, input, textarea, select, label, [role="radio"], [role="option"], [data-no-drag-scroll]',
+    ),
+  );
+}
 
 /**
  * Горизонтальная прокрутка: колесо мыши + drag (хватаешь и листаешь).
  * `active` — переподключить слушатели, когда контейнер появляется в DOM (модалки).
+ *
+ * Клики по кнопкам внутри ряда не перехватываются: capture и drag только с «пустого»
+ * фона или после смещения указателя за порог (не считаем лёгкий jitter кликом-drag).
  */
 export function useHorizontalScrollGestures(
   ref: RefObject<HTMLElement | null>,
@@ -33,11 +45,11 @@ export function useHorizontalScrollGestures(
     const onPointerDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
       if (!canScroll()) return;
+      if (isInteractiveScrollTarget(e.target)) return;
       pointerId = e.pointerId;
       startX = e.clientX;
       startScrollLeft = el.scrollLeft;
       dragging = false;
-      el.setPointerCapture(pointerId);
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -46,6 +58,11 @@ export function useHorizontalScrollGestures(
       if (!dragging && Math.abs(dx) < DRAG_THRESHOLD_PX) return;
       if (!dragging) {
         dragging = true;
+        try {
+          el.setPointerCapture(pointerId);
+        } catch {
+          /* pointer already released */
+        }
         el.classList.add("vf-h-scroll-dragging");
       }
       e.preventDefault();

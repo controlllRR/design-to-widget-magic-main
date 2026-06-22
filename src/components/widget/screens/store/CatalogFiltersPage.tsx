@@ -160,15 +160,15 @@ function FilterSection({
               style={{
                 color: "#343537",
                 transform: open ? undefined : "rotate(180deg)",
-                transition: "transform var(--vf-anim-duration-fast) var(--vf-anim-ease)",
+                transition: "transform 0.15s",
               }}
             />
           </button>
         </div>
       </div>
-      <div className={`vf-anim-expand${open ? " vf-anim-expand--open" : ""}`}>
+      {open ? (
         <div
-          className="vf-anim-expand-inner flex flex-col"
+          className="flex flex-col"
           style={{
             gap: 10,
             marginTop: 10,
@@ -177,7 +177,7 @@ function FilterSection({
         >
           {children}
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
@@ -297,7 +297,7 @@ export function CatalogFiltersPage({
 
   return (
     <div
-      className="absolute inset-0 z-[60] flex flex-col min-h-0 overflow-hidden vf-anim-page-enter"
+      className="absolute inset-0 z-[60] flex flex-col min-h-0 overflow-hidden"
       style={{ ...widgetScreenShellStyle, backgroundColor: "#fff" }}
     >
       <WidgetHeader
