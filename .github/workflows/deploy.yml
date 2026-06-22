@@ -12,8 +12,6 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_ACCOUNT_ID: 9064121a2f1e7f5b5560dcae59b7703f
     permissions:
       contents: read
       deployments: write
@@ -29,13 +27,8 @@ jobs:
       - run: npm run build
 
       - name: Publish to Cloudflare Workers
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config dist/server/wrangler.json
-
-      - name: Skip deploy (no Cloudflare token)
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN == '' }}
-        run: echo "Добавьте CLOUDFLARE_API_TOKEN в Secrets репозитория для автодеплоя."
