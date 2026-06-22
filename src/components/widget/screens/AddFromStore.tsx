@@ -66,7 +66,7 @@ export function AddFromStore({
   };
 
   return (
-    <div className="relative flex flex-col flex-1 min-h-0 h-full w-full" style={widgetScreenShellStyle}>
+    <div className="relative flex flex-col flex-1 min-h-0 min-w-0 h-full w-full" style={widgetScreenShellStyle}>
       <WidgetHeader
         onMenu={onOpenMenu}
         onProfile={onOpenMenu}
@@ -131,33 +131,35 @@ export function AddFromStore({
         </div>
       </div>
 
-      <div
-        className="shrink-0 flex"
-        style={{ gap: 10, paddingInline: 12, paddingTop: 12, paddingBottom: 0 }}
-      >
-        <button
-          type="button"
-          disabled={!selected}
-          onClick={() => selected && onAdd?.(selected)}
-          className="flex-1 text-xs font-extrabold uppercase tracking-wide disabled:cursor-not-allowed"
-          style={{
-            ...primaryButtonStyle(Boolean(selected)),
-            letterSpacing: "0.09em",
-            opacity: selected ? 1 : undefined,
-          }}
+      <div className="shrink-0 vf-pb-safe">
+        <div
+          className="flex"
+          style={{ gap: 10, paddingInline: "var(--vf-sp-12)", paddingTop: "var(--vf-sp-12)" }}
         >
-          {s.store.select}
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex-1 text-xs font-extrabold uppercase tracking-wide"
-          style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
-        >
-          {s.store.cancel}
-        </button>
+          <button
+            type="button"
+            disabled={!selected}
+            onClick={() => selected && onAdd?.(selected)}
+            className="flex-1 text-xs font-extrabold uppercase tracking-wide disabled:cursor-not-allowed"
+            style={{
+              ...primaryButtonStyle(Boolean(selected)),
+              letterSpacing: "0.09em",
+              opacity: selected ? 1 : undefined,
+            }}
+          >
+            {s.store.select}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 text-xs font-extrabold uppercase tracking-wide"
+            style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
+          >
+            {s.store.cancel}
+          </button>
+        </div>
+        <Watermark compact />
       </div>
-      <Watermark />
 
       {filtersOpen ? (
         <CatalogFiltersPage

@@ -71,7 +71,7 @@ export function NumberInput({
     backgroundColor: bg,
     border: `1px solid ${borderColor}`,
     borderRadius: 999,
-    height: "clamp(32px, 9.6vw, 36px)",
+    height: "clamp(32px, 9.6cqw, 36px)",
     paddingInline: "var(--vf-sp-12)",
   };
 

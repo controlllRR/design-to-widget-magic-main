@@ -368,8 +368,8 @@ export function CreateProfile({
           <div
             className="rounded-full flex items-center justify-center overflow-hidden"
             style={{
-              width: "clamp(56px, 17vw, 64px)",
-              height: "clamp(56px, 17vw, 64px)",
+              width: "clamp(56px, 17cqw, 64px)",
+              height: "clamp(56px, 17cqw, 64px)",
               border: "1px solid color-mix(in oklab, var(--vf-text) 25%, transparent)",
             }}
           >
@@ -949,11 +949,10 @@ export function CreateProfile({
 
       {/* Sticky CTA — Figma: кнопка вне scroll */}
       <div
-        className="shrink-0 w-full min-w-0"
+        className="shrink-0 w-full min-w-0 vf-pb-safe"
         style={{
           paddingInline: "var(--vf-sp-12)",
           paddingTop: "var(--vf-sp-12)",
-          paddingBottom: "var(--vf-sp-8)",
           backgroundColor: "var(--vf-surface)",
         }}
       >

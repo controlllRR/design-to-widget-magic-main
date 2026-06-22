@@ -49,12 +49,12 @@ export function GenerationToolbar({
   ];
 
   return (
-    <div className="flex items-center gap-1.5 px-3">
+    <div className="flex items-center gap-1.5 px-3 min-w-0">
       <button
         type="button"
         disabled={disabled}
         onClick={onPrimary}
-        className="flex-1 text-xs font-bold uppercase tracking-wide shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex-1 min-w-0 text-xs font-bold uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-40"
         style={{
           height: "var(--vf-sz-46)",
           borderRadius: "var(--vf-radius-button)",
@@ -62,7 +62,7 @@ export function GenerationToolbar({
           color: "var(--vf-btn-text)",
         }}
       >
-        {primaryLabel}
+        <span className="block truncate px-1">{primaryLabel}</span>
       </button>
       {secondaryActions.map(({ id, iconSrc, label, onClick }) => (
         <button

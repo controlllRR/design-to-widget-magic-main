@@ -148,7 +148,7 @@ export function CatalogPriceRange({
         backgroundColor: "#f6f6f6",
       }}
     >
-      <div className="flex items-center" style={{ gap: 8 }}>
+      <div className="flex items-center min-w-0" style={{ gap: 8 }}>
         <PricePill
           value={safeMin}
           ariaLabel="Минимальная цена"

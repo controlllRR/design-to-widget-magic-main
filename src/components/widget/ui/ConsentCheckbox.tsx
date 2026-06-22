@@ -21,8 +21,8 @@ export function ConsentCheckbox({
         aria-hidden
         className="rounded-[2px] flex items-center justify-center shrink-0"
         style={{
-          width: "clamp(14px, 4.4vw, 16px)",
-          height: "clamp(14px, 4.4vw, 16px)",
+          width: "clamp(14px, 4.4cqw, 16px)",
+          height: "clamp(14px, 4.4cqw, 16px)",
           marginTop: 1,
           border: "0.5px solid var(--vf-text)",
           backgroundColor: checked ? "var(--vf-text)" : "transparent",
@@ -32,8 +32,8 @@ export function ConsentCheckbox({
           <Check
             strokeWidth={3}
             style={{
-              width: "clamp(10px, 3.3vw, 12px)",
-              height: "clamp(10px, 3.3vw, 12px)",
+              width: "clamp(10px, 3.3cqw, 12px)",
+              height: "clamp(10px, 3.3cqw, 12px)",
               color: "var(--vf-surface)",
             }}
           />

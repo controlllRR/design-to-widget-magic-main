@@ -14,8 +14,8 @@ export function RadioDot({
       aria-hidden
       className="rounded-full flex items-center justify-center shrink-0"
       style={{
-        width: "clamp(14px, 4.4vw, 16px)",
-        height: "clamp(14px, 4.4vw, 16px)",
+        width: "clamp(14px, 4.4cqw, 16px)",
+        height: "clamp(14px, 4.4cqw, 16px)",
         border: `1px solid ${ring}`,
         backgroundColor: "rgba(255,255,255,0.6)",
       }}
@@ -24,8 +24,8 @@ export function RadioDot({
         <span
           className="rounded-full"
           style={{
-            width: "clamp(7px, 2.2vw, 8px)",
-            height: "clamp(7px, 2.2vw, 8px)",
+            width: "clamp(7px, 2.2cqw, 8px)",
+            height: "clamp(7px, 2.2cqw, 8px)",
             backgroundColor: dot,
           }}
         />

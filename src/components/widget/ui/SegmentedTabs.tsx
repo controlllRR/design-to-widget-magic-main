@@ -31,7 +31,7 @@ export function SegmentedTabs<T extends string>({
   ariaLabel,
 }: SegmentedTabsProps<T>) {
   if (variant === "inverted") {
-    const heights = size === "sm" ? "clamp(36px, 10.4vw, 40px)" : "clamp(40px, 12.3vw, 46px)";
+    const heights = size === "sm" ? "clamp(36px, 10.4cqw, 40px)" : "clamp(40px, 12.3cqw, 46px)";
     return (
       <div
         role="tablist"
@@ -125,7 +125,7 @@ export function SegmentedTabs<T extends string>({
   }
 
   // pill
-  const heights = size === "sm" ? "clamp(36px, 10.4vw, 40px)" : "clamp(40px, 12.3vw, 46px)";
+  const heights = size === "sm" ? "clamp(36px, 10.4cqw, 40px)" : "clamp(40px, 12.3cqw, 46px)";
   return (
     <div
       role="tablist"

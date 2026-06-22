@@ -47,8 +47,8 @@ export function RadioRow<T extends string>({
               aria-hidden
               className="rounded-full flex items-center justify-center shrink-0"
               style={{
-                width: "clamp(14px, 4.4vw, 16px)",
-                height: "clamp(14px, 4.4vw, 16px)",
+                width: "clamp(14px, 4.4cqw, 16px)",
+                height: "clamp(14px, 4.4cqw, 16px)",
                 border: "1.5px solid var(--vf-text)",
               }}
             >
@@ -56,8 +56,8 @@ export function RadioRow<T extends string>({
                 <span
                   className="rounded-full"
                   style={{
-                    width: "clamp(7px, 2.2vw, 8px)",
-                    height: "clamp(7px, 2.2vw, 8px)",
+                    width: "clamp(7px, 2.2cqw, 8px)",
+                    height: "clamp(7px, 2.2cqw, 8px)",
                     backgroundColor: "var(--vf-text)",
                   }}
                 />

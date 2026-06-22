@@ -63,7 +63,7 @@ export function SplashScreen({
           <div
             className="absolute inset-x-0 bottom-0 pointer-events-none"
             style={{
-              height: "clamp(64px, 21vw, 80px)",
+              height: "clamp(64px, 21cqw, 80px)",
               background:
                 "linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0))",
             }}

@@ -158,7 +158,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
     >
       <UserMenuPinsProvider>
       <UserMenuNavProvider onSelect={handleMenuSelect}>
-      <div className="relative flex flex-1 flex-col min-h-0 w-full">
+      <div className="relative flex flex-1 flex-col min-h-0 min-w-0 w-full">
       {screen === "splash" && (
         <SplashScreen onStart={() => navigate("start-page")} />
       )}

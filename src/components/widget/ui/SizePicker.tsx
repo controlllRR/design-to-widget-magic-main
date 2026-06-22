@@ -40,7 +40,7 @@ export function SizePicker({
 
   const radius = shape === "circle" ? 999 : 12;
   const itemSize =
-    shape === "circle" ? "clamp(40px, 11vw, 44px)" : "clamp(44px, 12vw, 48px)";
+    shape === "circle" ? "clamp(40px, 11cqw, 44px)" : "clamp(44px, 12cqw, 48px)";
 
   return (
     <div className="w-full min-w-0" style={paramCardStyle}>

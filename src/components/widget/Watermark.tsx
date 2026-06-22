@@ -45,12 +45,12 @@ export function Watermark({ compact }: { compact?: boolean } = {}) {
 
   return (
     <div
-      className="flex items-center justify-center w-full min-w-0"
+      className={`flex items-center justify-center w-full min-w-0${compact ? "" : " vf-pb-safe"}`}
       style={{
         paddingLeft: "var(--vf-sp-10)",
         paddingRight: "var(--vf-sp-10)",
         paddingTop: compact ? "var(--vf-sp-6)" : "var(--vf-sp-12)",
-        paddingBottom: compact ? "var(--vf-sp-6)" : "var(--vf-sp-12)",
+        ...(compact ? { paddingBottom: "var(--vf-sp-6)" } : {}),
       }}
     >
       {content}

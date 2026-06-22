@@ -61,7 +61,7 @@ export function FieldRow({
         >
           {label}
         </span>
-        <div className="shrink-0" style={{ width: "clamp(86px, 26vw, 96px)" }}>
+        <div className="shrink-0" style={{ width: "clamp(86px, 26cqw, 96px)" }}>
           <NumberInput
             value={value}
             onChange={onChange}

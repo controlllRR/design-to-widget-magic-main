@@ -270,7 +270,7 @@ export function GenerationPage({
   return (
     <div
       ref={shellRef}
-      className="relative flex flex-col flex-1 min-h-0"
+      className="relative flex flex-col flex-1 min-h-0 min-w-0"
       style={widgetScreenShellStyle}
     >
       {shareNoticeLocal ? (
@@ -301,7 +301,6 @@ export function GenerationPage({
           />
         ) : null}
         <GenerationHero
-          height={516}
           wearRails
           disabled={isGenerating}
           selectedWearId={selectedWearId}

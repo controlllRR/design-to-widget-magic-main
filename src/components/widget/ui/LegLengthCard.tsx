@@ -72,7 +72,7 @@ export function LegLengthCard({
               onClick={() => onChange(opt.id)}
               className="flex flex-1 items-center justify-center min-w-0"
               style={{
-                height: "clamp(36px, 10vw, 40px)",
+                height: "clamp(36px, 10cqw, 40px)",
                 background: "transparent",
                 border: "none",
                 padding: 0,
@@ -82,8 +82,8 @@ export function LegLengthCard({
               <span
                 className="inline-flex items-center justify-center"
                 style={{
-                  minWidth: active ? "clamp(36px, 10vw, 40px)" : undefined,
-                  height: "clamp(32px, 9vw, 36px)",
+                  minWidth: active ? "clamp(36px, 10cqw, 40px)" : undefined,
+                  height: "clamp(32px, 9cqw, 36px)",
                   paddingInline: active ? "var(--vf-sp-12)" : 0,
                   borderRadius: 999,
                   backgroundColor: active ? "var(--vf-surface)" : "transparent",

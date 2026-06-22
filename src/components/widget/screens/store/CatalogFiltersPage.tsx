@@ -521,43 +521,48 @@ export function CatalogFiltersPage({
       </div>
 
       <div
-        className="shrink-0 flex"
+        className="shrink-0 vf-pb-safe"
         style={{
-          gap: 10,
-          paddingInline: 12,
-          paddingTop: 12,
-          paddingBottom: 8,
           backgroundColor: "#fff",
         }}
       >
-        <button
-          type="button"
-          onClick={() => {
-            const next =
-              draft.priceMin === null && draft.priceMax === null
-                ? draft
-                : {
-                    ...draft,
-                    priceMin: draft.priceMin ?? CATALOG_PRICE_DEFAULT_MIN,
-                    priceMax: draft.priceMax ?? CATALOG_PRICE_DEFAULT_MAX,
-                  };
-            onApply(next);
+        <div
+          className="flex"
+          style={{
+            gap: 10,
+            paddingInline: "var(--vf-sp-12)",
+            paddingTop: "var(--vf-sp-12)",
           }}
-          className="flex-1 text-xs font-extrabold uppercase tracking-wide"
-          style={{ ...primaryButtonStyle(true), letterSpacing: "0.09em" }}
         >
-          {f.show}
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex-1 text-xs font-extrabold uppercase tracking-wide"
-          style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
-        >
-          {f.cancel}
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              const next =
+                draft.priceMin === null && draft.priceMax === null
+                  ? draft
+                  : {
+                      ...draft,
+                      priceMin: draft.priceMin ?? CATALOG_PRICE_DEFAULT_MIN,
+                      priceMax: draft.priceMax ?? CATALOG_PRICE_DEFAULT_MAX,
+                    };
+              onApply(next);
+            }}
+            className="flex-1 text-xs font-extrabold uppercase tracking-wide"
+            style={{ ...primaryButtonStyle(true), letterSpacing: "0.09em" }}
+          >
+            {f.show}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 text-xs font-extrabold uppercase tracking-wide"
+            style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
+          >
+            {f.cancel}
+          </button>
+        </div>
+        <Watermark compact />
       </div>
-      <Watermark compact />
     </div>
   );
 }

@@ -9,7 +9,11 @@ npm install
 npm run dev
 ```
 
-Откройте [http://localhost:5173](http://localhost:5173).
+Откройте [http://localhost:8080](http://localhost:8080) (порт смотри в выводе `npm run dev`).
+
+**Прод:** https://tanstack-start-app.virtufit-widget.workers.dev
+
+Подробный гайд для агента: [docs/AGENT-DEPLOY-GUIDE.md](docs/AGENT-DEPLOY-GUIDE.md)
 
 ## Сборка
 
@@ -25,9 +29,8 @@ npm run build
    - `CLOUDFLARE_ACCOUNT_ID` (на странице Workers → Overview)
 3. Запушьте в ветку `main` — workflow `.github/workflows/deploy.yml` задеплоит приложение.
 
-Локальный деплой:
+Локальный деплой (на Windows часто нестабилен из‑за размера ассетов — лучше через GitHub Actions):
 
 ```bash
-npm run build
-npx wrangler deploy
+npm run deploy
 ```

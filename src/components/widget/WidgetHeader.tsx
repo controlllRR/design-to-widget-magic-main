@@ -107,7 +107,7 @@ export function WidgetHeader({
           </span>
         )}
         <span
-          className="leading-[1.2] whitespace-nowrap lowercase"
+          className="leading-[1.2] lowercase vf-header-profile-label"
           style={{
             fontSize: "var(--vf-fs-12)",
             fontWeight: 200,
@@ -119,13 +119,15 @@ export function WidgetHeader({
       </button>
 
       {showPinnedShortcuts &&
-        headerPinnedIds.map((id) => (
+        headerPinnedIds.map((id, index) => (
           <button
             key={`pin-${id}`}
             type="button"
             aria-label={USER_MENU_ARIA_LABELS[id]}
             onClick={() => onMenuNav?.(id)}
-            className="flex items-center justify-center shrink-0"
+            className={`flex items-center justify-center shrink-0 vf-header-pin${
+              index === headerPinnedIds.length - 1 ? " vf-header-pin--collapse" : ""
+            }`}
             style={{ width: "var(--vf-sz-52)", height: "var(--vf-sz-52)" }}
           >
             <UserMenuItemIcon

@@ -109,43 +109,46 @@
    * Виджет на мобильных растягивается на всю ширину экрана, на десктопе — 375px.
    */
   [data-vf-root] {
-    /* spacing */
-    --vf-sp-2: clamp(2px, 0.55vw, 2px);
-    --vf-sp-4: clamp(3px, 1.1vw, 4px);
-    --vf-sp-6: clamp(5px, 1.65vw, 6px);
-    --vf-sp-8: clamp(7px, 2.2vw, 8px);
-    --vf-sp-10: clamp(8px, 2.7vw, 10px);
-    --vf-sp-12: clamp(10px, 3.3vw, 12px);
-    --vf-sp-14: clamp(12px, 3.85vw, 14px);
-    --vf-sp-16: clamp(14px, 4.4vw, 16px);
-    --vf-sp-20: clamp(17px, 5.5vw, 20px);
-    --vf-sp-24: clamp(20px, 6.6vw, 24px);
-    --vf-sp-28: clamp(24px, 7.7vw, 28px);
-    --vf-sp-32: clamp(27px, 8.8vw, 32px);
+    container-type: inline-size;
+    container-name: vf;
+
+    /* spacing — cqw от ширины виджета (375px design), не viewport */
+    --vf-sp-2: clamp(2px, 0.55cqw, 2px);
+    --vf-sp-4: clamp(3px, 1.1cqw, 4px);
+    --vf-sp-6: clamp(5px, 1.65cqw, 6px);
+    --vf-sp-8: clamp(7px, 2.2cqw, 8px);
+    --vf-sp-10: clamp(8px, 2.7cqw, 10px);
+    --vf-sp-12: clamp(10px, 3.3cqw, 12px);
+    --vf-sp-14: clamp(12px, 3.85cqw, 14px);
+    --vf-sp-16: clamp(14px, 4.4cqw, 16px);
+    --vf-sp-20: clamp(17px, 5.5cqw, 20px);
+    --vf-sp-24: clamp(20px, 6.6cqw, 24px);
+    --vf-sp-28: clamp(24px, 7.7cqw, 28px);
+    --vf-sp-32: clamp(27px, 8.8cqw, 32px);
 
     /* control sizes */
-    --vf-sz-22: clamp(19px, 6vw, 22px);
-    --vf-sz-24: clamp(20px, 6.5vw, 24px);
-    --vf-sz-44: clamp(38px, 11.7vw, 44px);
-    --vf-sz-46: clamp(40px, 12.3vw, 46px);
-    --vf-sz-52: clamp(44px, 13.9vw, 52px);
+    --vf-sz-22: clamp(19px, 6cqw, 22px);
+    --vf-sz-24: clamp(20px, 6.5cqw, 24px);
+    --vf-sz-44: clamp(38px, 11.7cqw, 44px);
+    --vf-sz-46: clamp(40px, 12.3cqw, 46px);
+    --vf-sz-52: clamp(44px, 13.9cqw, 52px);
     /* Плитки силуэтов (телосложение, грудь, живот…) — одинаковый размер независимо от числа вариантов */
-    --vf-sz-shape-tile: clamp(48px, 14vw, 60px);
+    --vf-sz-shape-tile: clamp(48px, 14cqw, 60px);
 
     /* font sizes */
-    --vf-fs-10: clamp(9px, 2.7vw, 10px);
-    --vf-fs-12: clamp(11px, 3.3vw, 12px);
-    --vf-fs-13: clamp(12px, 3.55vw, 13px);
-    --vf-fs-14: clamp(13px, 3.85vw, 14px);
-    --vf-fs-16: clamp(14px, 4.4vw, 16px);
-    --vf-fs-22: clamp(19px, 6vw, 22px);
-    --vf-fs-26: clamp(22px, 7.1vw, 26px);
+    --vf-fs-10: clamp(9px, 2.7cqw, 10px);
+    --vf-fs-12: clamp(11px, 3.3cqw, 12px);
+    --vf-fs-13: clamp(12px, 3.55cqw, 13px);
+    --vf-fs-14: clamp(13px, 3.85cqw, 14px);
+    --vf-fs-16: clamp(14px, 4.4cqw, 16px);
+    --vf-fs-22: clamp(19px, 6cqw, 22px);
+    --vf-fs-26: clamp(22px, 7.1cqw, 26px);
 
     /* heights */
-    --vf-h-hero: clamp(360px, 56dvh, 420px);
-    --vf-h-card: clamp(140px, 42vw, 158px);
+    --vf-h-hero: clamp(280px, 72cqw, 420px);
+    --vf-h-card: clamp(96px, 32cqw, 158px);
     /* Configuring Generation hero — Figma 723:3180 */
-    --vf-h-configuring-hero: clamp(234px, 73.3vw, 275px);
+    --vf-h-configuring-hero: clamp(200px, 73.3cqw, 275px);
 
     /* selection tiles — тот же primary, что у размеров одежды (Figma 674:4976) */
     --vf-tile-selected-bg: var(--vf-primary);
@@ -300,6 +303,68 @@
     .vf-no-scrollbar
   ).vf-is-scrolling::-webkit-scrollbar-thumb {
   background-color: color-mix(in oklab, var(--vf-text, oklch(0.35 0 0)) 32%, transparent);
+}
+
+/* Safe area (iOS notch / home indicator) */
+.vf-pb-safe {
+  padding-bottom: max(var(--vf-sp-12), env(safe-area-inset-bottom, 0px));
+}
+
+.vf-pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Hero overlay rails — fluid от токенов виджета */
+.vf-hero-rail {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--vf-sp-16);
+  width: var(--vf-sz-46);
+  top: var(--vf-sp-20);
+  bottom: var(--vf-sp-20);
+}
+
+.vf-hero-rail--left {
+  left: var(--vf-sp-12);
+}
+
+.vf-hero-rail--right {
+  right: var(--vf-sp-12);
+}
+
+.vf-hero-dots {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: var(--vf-sp-20);
+  display: flex;
+  align-items: center;
+  gap: var(--vf-sp-20);
+}
+
+.vf-header-profile-label {
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@container vf (max-width: 359px) {
+  [data-vf-root] .vf-header-pin--collapse {
+    display: none;
+  }
+
+  [data-vf-root] .vf-header-profile-label {
+    max-width: 3.75rem;
+  }
+}
+
+@container vf (max-width: 329px) {
+  [data-vf-root] .vf-header-pin {
+    display: none;
+  }
 }
 
 /* TikTok Sans: применяем opsz=24 и width=ExtraExpanded (125) для всех заголовков виджета */

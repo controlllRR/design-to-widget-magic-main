@@ -27,7 +27,6 @@ export function PreloaderPreview({ variant = "v1", onDone }: PreloaderPreviewPro
 
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto pb-2">
         <GenerationHero
-          height={516}
           wearRails
           disabled
           overlay={<GenerationPreloaderOverlay label={t.screens.preloader.label} />}

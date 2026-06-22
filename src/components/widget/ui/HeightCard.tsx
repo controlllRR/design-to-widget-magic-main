@@ -106,7 +106,7 @@ export function HeightCard({
               onClick={() => onChange(opt.id)}
               className="flex items-center justify-center transition-colors shrink-0"
               style={{
-                height: "clamp(40px, 11vw, 44px)",
+                height: "clamp(40px, 11cqw, 44px)",
                 paddingInline: "var(--vf-sp-16)",
                 ...selectionTileStyle(active, { radius: 999 }),
                 fontFamily: "var(--vf-font-body)",

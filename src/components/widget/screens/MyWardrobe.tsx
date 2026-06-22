@@ -138,7 +138,7 @@ export function MyWardrobe({
   };
 
   return (
-    <div className="relative flex flex-col flex-1 min-h-0 h-full w-full" style={widgetScreenShellStyle}>
+    <div className="relative flex flex-col flex-1 min-h-0 min-w-0 h-full w-full" style={widgetScreenShellStyle}>
       <WidgetHeader
         onMenu={onOpenMenu}
         onProfile={onOpenMenu}
@@ -197,35 +197,40 @@ export function MyWardrobe({
       </div>
 
       {isSetPick ? (
-        <div
-          className="shrink-0 flex"
-          style={{ gap: 10, paddingInline: 12, paddingTop: 12, paddingBottom: 0 }}
-        >
-          <button
-            type="button"
-            disabled={!selectedSet}
-            onClick={() => selectedSet && onSelectSet?.(selectedSet)}
-            className="flex-1 text-xs font-extrabold uppercase tracking-wide disabled:cursor-not-allowed"
-            style={{
-              ...primaryButtonStyle(Boolean(selectedSet)),
-              letterSpacing: "0.09em",
-              opacity: selectedSet ? 1 : undefined,
-            }}
+        <div className="shrink-0 vf-pb-safe">
+          <div
+            className="flex"
+            style={{ gap: 10, paddingInline: "var(--vf-sp-12)", paddingTop: "var(--vf-sp-12)" }}
           >
-            {s.wardrobe.selectSet}
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="flex-1 text-xs font-extrabold uppercase tracking-wide"
-            style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
-          >
-            {s.wardrobe.cancelPick}
-          </button>
+            <button
+              type="button"
+              disabled={!selectedSet}
+              onClick={() => selectedSet && onSelectSet?.(selectedSet)}
+              className="flex-1 text-xs font-extrabold uppercase tracking-wide disabled:cursor-not-allowed"
+              style={{
+                ...primaryButtonStyle(Boolean(selectedSet)),
+                letterSpacing: "0.09em",
+                opacity: selectedSet ? 1 : undefined,
+              }}
+            >
+              {s.wardrobe.selectSet}
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 text-xs font-extrabold uppercase tracking-wide"
+              style={{ ...secondaryButtonStyle, letterSpacing: "0.09em" }}
+            >
+              {s.wardrobe.cancelPick}
+            </button>
+          </div>
+          <Watermark compact />
         </div>
-      ) : null}
-
-      <Watermark />
+      ) : (
+        <div className="shrink-0 vf-pb-safe">
+          <Watermark compact />
+        </div>
+      )}
 
       <WardrobeEditSheet
         open={editItem !== null}

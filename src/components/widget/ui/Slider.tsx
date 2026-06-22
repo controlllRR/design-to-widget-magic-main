@@ -68,8 +68,8 @@ export function Slider({
           top: "50%",
           left: `${pct}%`,
           transform: "translate(-50%, -50%)",
-          width: "clamp(14px, 4.4vw, 16px)",
-          height: "clamp(14px, 4.4vw, 16px)",
+          width: "clamp(14px, 4.4cqw, 16px)",
+          height: "clamp(14px, 4.4cqw, 16px)",
           backgroundColor: color,
           boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
         }}

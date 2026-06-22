@@ -49,7 +49,7 @@ export function StartPage({
 
       <div className="flex flex-col flex-1 w-full min-w-0 min-h-0">
         <div
-          className="flex flex-col w-full min-w-0 flex-1 min-h-0"
+          className="flex flex-col w-full min-w-0 flex-1 min-h-0 overflow-y-auto vf-scroll"
           style={{ gap: "var(--vf-sp-24)" }}
         >
           {/* Title */}
@@ -174,16 +174,16 @@ export function StartPage({
               <div
                 className="rounded-full flex items-center justify-center"
                 style={{
-                  width: "clamp(86px, 27.5vw, 103px)",
-                  height: "clamp(86px, 27.5vw, 103px)",
+                  width: "clamp(86px, 27.5cqw, 103px)",
+                  height: "clamp(86px, 27.5cqw, 103px)",
                   border: "1px dashed var(--vf-text)",
                 }}
               >
                 <Plus
                   strokeWidth={1.2}
                   style={{
-                    width: "clamp(32px, 10.4vw, 39px)",
-                    height: "clamp(32px, 10.4vw, 39px)",
+                    width: "clamp(32px, 10.4cqw, 39px)",
+                    height: "clamp(32px, 10.4cqw, 39px)",
                     color: "var(--vf-text)",
                   }}
                 />
@@ -228,7 +228,7 @@ export function StartPage({
 
           {/* Divider + checkboxes */}
           <div
-            className="flex flex-col w-full min-w-0 shrink-0 mt-auto"
+            className="flex flex-col w-full min-w-0 shrink-0"
             style={{ gap: "var(--vf-sp-16)" }}
           >
             <div
@@ -240,7 +240,7 @@ export function StartPage({
               className="flex flex-col w-full min-w-0"
               style={{
                 gap: "var(--vf-sp-12)",
-                paddingBottom: "clamp(18px, 5.85vw, 22px)",
+                paddingBottom: "clamp(18px, 5.85cqw, 22px)",
                 paddingInline: "var(--vf-sp-12)",
               }}
             >
@@ -258,9 +258,8 @@ export function StartPage({
           </div>
         </div>
 
-        {/* CTA */}
         <div
-          className="flex flex-col w-full min-w-0 shrink-0"
+          className="flex flex-col w-full min-w-0 shrink-0 vf-pb-safe"
           style={{
             paddingTop: "var(--vf-sp-12)",
             paddingInline: "var(--vf-sp-12)",
@@ -295,9 +294,8 @@ export function StartPage({
               {ts.cta.trim() || "продолжить"}
             </span>
           </button>
+          <Watermark compact />
         </div>
-
-        <Watermark />
       </div>
     </div>
   );
