@@ -329,9 +329,24 @@
   flex-direction: column;
   gap: var(--vf-sp-12);
   padding-inline: var(--vf-sp-12);
-  padding-top: var(--vf-sp-16);
-  padding-bottom: max(var(--vf-sp-20), env(safe-area-inset-bottom, 0px));
+  padding-top: var(--vf-sp-12);
+  padding-bottom: max(var(--vf-sp-16), env(safe-area-inset-bottom, 0px));
   background-color: var(--vf-surface);
+  border-top: 1px solid var(--vf-border);
+  box-shadow: 0 -8px 24px color-mix(in oklab, var(--vf-text) 6%, transparent);
+}
+
+.vf-start-consents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vf-sp-12);
+}
+
+.vf-start-cta {
+  flex-shrink: 0;
+  height: var(--vf-sz-46);
+  min-height: var(--vf-sz-46);
+  margin-top: var(--vf-sp-4);
 }
 
 @media (max-height: 740px) {

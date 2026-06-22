@@ -16,7 +16,7 @@ export interface StartPageProps {
 
 /**
  * Start-page — Figma `674:3338`.
- * На коротких экранах (iPhone SE/15) весь контент в одном скролле — без sticky-footer.
+ * Grid: карточки скроллятся, согласия + CTA — отдельная строка снизу (без наложения на iOS).
  */
 export function StartPage({
   onOpenUserMenu,
@@ -48,9 +48,13 @@ export function StartPage({
       />
 
       <div
-        className="vf-start-scroll vf-scroll flex flex-col w-full min-w-0"
-        style={{ gap: "var(--vf-start-section-gap)" }}
+        className="grid flex-1 min-h-0 min-w-0 w-full"
+        style={{ gridTemplateRows: "minmax(0, 1fr) auto" }}
       >
+        <div
+          className="vf-start-scroll vf-scroll flex flex-col w-full min-w-0 min-h-0 overflow-y-auto"
+          style={{ gap: "var(--vf-start-section-gap)" }}
+        >
         {/* Title */}
         <div
           className="flex flex-col w-full min-w-0 shrink-0"
@@ -142,7 +146,7 @@ export function StartPage({
           </div>
         </button>
 
-        {/* Pro — светлая карточка с пунктирным кругом (Figma 674:3338) */}
+        {/* Pro */}
         <button
           type="button"
           onClick={() => setVariant("pro")}
@@ -151,6 +155,7 @@ export function StartPage({
           style={{
             gap: "var(--vf-sp-12)",
             paddingInline: "var(--vf-sp-12)",
+            paddingBottom: "var(--vf-sp-8)",
           }}
         >
           <div
@@ -224,14 +229,11 @@ export function StartPage({
             </div>
           </div>
         </button>
+      </div>
 
-        {/* Divider + checkboxes + CTA + watermark — в одном потоке скролла */}
-        <div className="vf-start-footer-block shrink-0">
-          <div
-            className="h-px w-full"
-            style={{ backgroundColor: "var(--vf-border)" }}
-            aria-hidden
-          />
+      {/* Футер вне скролла — отдельная grid-строка, кнопка не наезжает на чекбоксы */}
+      <div className="vf-start-footer-block shrink-0 min-w-0">
+        <div className="vf-start-consents">
           <ConsentCheckbox
             checked={agreeData}
             onChange={setAgreeData}
@@ -242,37 +244,34 @@ export function StartPage({
             onChange={setAgreePolicy}
             label={ts.agreePolicy}
           />
-          <button
-            type="button"
-            disabled={!canStart}
-            onClick={() => canStart && onStart?.(variant)}
-            className="flex items-center justify-center w-full transition-colors min-w-0 disabled:cursor-not-allowed"
+        </div>
+        <button
+          type="button"
+          disabled={!canStart}
+          onClick={() => canStart && onStart?.(variant)}
+          className="vf-start-cta flex items-center justify-center w-full transition-colors min-w-0 disabled:cursor-not-allowed"
+          style={{
+            backgroundColor: canStart
+              ? "var(--vf-btn-bg)"
+              : "var(--vf-btn-bg-disabled)",
+            borderRadius: "var(--vf-radius-button)",
+            color: canStart ? "var(--vf-btn-text)" : "rgba(255,255,255,0.5)",
+          }}
+        >
+          <span
+            className="uppercase whitespace-nowrap"
             style={{
-              gap: "var(--vf-sp-10)",
-              height: "var(--vf-sz-46)",
-              paddingInline: "var(--vf-sp-28)",
-              paddingBlock: "var(--vf-sp-12)",
-              backgroundColor: canStart
-                ? "var(--vf-btn-bg)"
-                : "var(--vf-btn-bg-disabled)",
-              borderRadius: "var(--vf-radius-button)",
+              fontFamily: "var(--vf-font-body)",
+              fontSize: "var(--vf-fs-12)",
+              fontWeight: 800,
+              letterSpacing: "1.08px",
             }}
           >
-            <span
-              className="uppercase whitespace-nowrap"
-              style={{
-                fontFamily: "var(--vf-font-body)",
-                fontSize: "var(--vf-fs-12)",
-                fontWeight: 800,
-                letterSpacing: "1.08px",
-                color: canStart ? "var(--vf-btn-text)" : "rgba(255,255,255,0.5)",
-              }}
-            >
-              {ts.cta.trim() || "продолжить"}
-            </span>
-          </button>
-          <Watermark compact />
-        </div>
+            {ts.cta.trim() || "продолжить"}
+          </span>
+        </button>
+        <Watermark compact />
+      </div>
       </div>
     </div>
   );
