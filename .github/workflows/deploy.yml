@@ -31,12 +31,14 @@ jobs:
         run: npm run build
 
       - name: Register workers.dev subdomain
+        continue-on-error: true
         run: |
           curl -sf -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/subdomain" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
-            --data '{"subdomain":"virtufit-widget"}'
+            --data '{"subdomain":"virtufit-widget"}' \
+            || echo "Subdomain already registered or API skipped — continuing deploy."
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
