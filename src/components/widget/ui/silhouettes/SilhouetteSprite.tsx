@@ -106,9 +106,17 @@ export function SilhouetteSprite({
     gender === "female"
       ? FEMALE_ROW_LAYOUT[category]
       : MALE_ROW_LAYOUT[category];
-  const cx = COL_CENTERS[Math.max(0, Math.min(4, index))];
-  const x = cx - ICON_W / 2;
-  const cropW = ICON_W;
+  const indexClamped = Math.max(0, Math.min(4, index));
+  const cx = COL_CENTERS[indexClamped];
+  let x = cx - ICON_W / 2;
+  let cropW = ICON_W;
+  // Крайние столбцы: шире окно кропа, чтобы силуэт не обрезался (особенно «широкие» бёдра).
+  if (indexClamped === 0) {
+    cropW = ICON_W + 4;
+  } else if (indexClamped === 4) {
+    x = cx - ICON_W / 2 - 5;
+    cropW = ICON_W + 8;
+  }
   const cropY = layout.y + ICON_PAD_TOP;
   const cropH = ICON_H;
 

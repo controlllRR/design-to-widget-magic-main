@@ -1,7 +1,7 @@
 import { Menu, X } from "lucide-react";
-import profileAvatar from "@/assets/generation/profile-0.png";
+import profileDefault from "@/assets/generation/profile-default.png";
 import { BrandLogo } from "./BrandLogo";
-import { useWidgetProfileOptional } from "@/widget/WidgetProfileContext";
+import { useWidgetProfileOptional, profileAvatarImageStyle } from "@/widget/WidgetProfileContext";
 import {
   USER_MENU_ARIA_LABELS,
   UserMenuCloseIcon,
@@ -58,7 +58,8 @@ export function WidgetHeader({
   const { headerPinnedIds } = useUserMenuPins();
   const onMenuNav = useUserMenuNav();
   const widgetProfile = useWidgetProfileOptional();
-  const avatarSrc = widgetProfile?.headerAvatar ?? profileAvatar;
+  const avatarSrc = widgetProfile?.headerAvatar ?? profileDefault;
+  const avatarStyle = profileAvatarImageStyle();
 
   return (
     <header className="flex items-center w-full min-w-0 shrink-0" style={{ borderBottom: border }}>
@@ -105,6 +106,7 @@ export function WidgetHeader({
               src={avatarSrc}
               alt=""
               className="w-full h-full object-cover"
+              style={avatarStyle}
               draggable={false}
             />
           </span>

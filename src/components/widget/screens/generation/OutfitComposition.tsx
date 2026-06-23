@@ -1,4 +1,5 @@
 import { AlertTriangle, ShoppingCart } from "lucide-react";
+import { useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import type { OutfitItem } from "./data";
 import {
@@ -20,6 +21,16 @@ export function OutfitComposition({
   onBuyAll?: () => void;
 }) {
   const { t } = useWidgetConfig();
+  const [cartIds, setCartIds] = useState<Set<string>>(() => new Set());
+
+  const toggleCart = (id: string) => {
+    setCartIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   return (
     <section style={{ paddingInline: "var(--vf-sp-12)" }}>
@@ -37,6 +48,7 @@ export function OutfitComposition({
       <div className="flex flex-col">
         {items.map((item, index) => {
           const active = highlightedId === item.id;
+          const inCart = cartIds.has(item.id);
           const isLast = index === items.length - 1;
           return (
             <div
@@ -117,11 +129,16 @@ export function OutfitComposition({
               <button
                 type="button"
                 aria-label="В корзину"
+                aria-pressed={inCart}
                 disabled={skeleton}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!skeleton) toggleCart(item.id);
+                }}
                 className="shrink-0 w-[42px] h-8 flex items-center justify-center rounded-xl disabled:opacity-40"
                 style={{
-                  backgroundColor: active ? "var(--vf-primary)" : undefined,
+                  backgroundColor: inCart ? "var(--vf-primary)" : undefined,
+                  border: inCart ? undefined : "1px solid #e5e7eb",
                 }}
               >
                 <img
@@ -130,7 +147,7 @@ export function OutfitComposition({
                   className="w-[18px] h-[18px] object-contain"
                   draggable={false}
                   style={
-                    active
+                    inCart
                       ? { filter: "brightness(0) invert(1)" }
                       : undefined
                   }

@@ -268,6 +268,7 @@
 }
 .vf-h-scroll button {
   cursor: inherit;
+  touch-action: pan-x;
 }
 .vf-h-scroll.vf-h-scroll-dragging button {
   cursor: grabbing;

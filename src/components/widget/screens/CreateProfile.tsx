@@ -64,6 +64,10 @@ interface CreateProfileProps {
   onDeleteProfile?: () => void;
   /** Gallery QA: проскроллить к параметрам — Figma `1211:25283`. */
   initialScrollToParams?: boolean;
+  /** При добавлении профиля с экрана конфигурации — сразу режим «модель». */
+  initialPhotoMode?: "own" | "model";
+  /** Предвыбранная модель при редактировании профиля. */
+  initialModelId?: string | null;
 }
 
 const PLACEHOLDER_PHOTO =
@@ -124,6 +128,8 @@ export function CreateProfile({
   onContinue,
   onDeleteProfile,
   initialScrollToParams = false,
+  initialPhotoMode,
+  initialModelId,
 }: CreateProfileProps) {
   const { config, t } = useWidgetConfig();
   const cp = config.createProfile;
@@ -135,9 +141,10 @@ export function CreateProfile({
 
   // Photo mode + photos
   const [photoMode, setPhotoMode] = useState<PhotoMode>(
-    cp.photoModes[0] ?? "own",
+    initialPhotoMode ?? cp.photoModes[0] ?? "own",
   );
   const [selectedModelId, setSelectedModelId] = useState<string | null>(() => {
+    if (initialModelId) return initialModelId;
     const key = profileModelCatalogId(cp.genders[0] ?? "female", false);
     return profileModelCatalogs[key][0]?.id ?? null;
   });

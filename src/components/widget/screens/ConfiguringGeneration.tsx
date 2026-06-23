@@ -20,6 +20,8 @@ export interface ConfiguringGenerationProps {
   onOpenMenu?: () => void;
   onClose?: () => void;
   onGenerate?: () => void;
+  onAddProfile?: () => void;
+  onEditProfile?: (index: number) => void;
 }
 
 /** Configuring Generation — Figma `723:3176`. */
@@ -27,13 +29,17 @@ export function ConfiguringGeneration({
   onOpenMenu,
   onClose,
   onGenerate,
+  onAddProfile,
+  onEditProfile,
 }: ConfiguringGenerationProps) {
   const { t } = useWidgetConfig();
   const cfg = t.screens.configuring;
+  const t_cp = t.createProfile;
   const {
     heroImage,
-    configuringProfileIndex,
-    setConfiguringProfileIndex,
+    profiles,
+    activeProfileIndex,
+    setActiveProfileIndex,
   } = useWidgetProfile();
   const [selectedPoses, setSelectedPoses] = useState<ReadonlySet<PoseId>>(
     () => new Set<PoseId>(["front", "three-quarter", "back"]),
@@ -82,8 +88,13 @@ export function ConfiguringGeneration({
             {cfg.selectProfile}
           </h2>
           <ProfileAvatarPicker
-            selected={configuringProfileIndex}
-            onSelect={setConfiguringProfileIndex}
+            profiles={profiles}
+            selected={activeProfileIndex}
+            onSelect={setActiveProfileIndex}
+            onAdd={onAddProfile}
+            onEdit={onEditProfile}
+            editLabel={cfg.editProfile}
+            addLabel={t_cp.addLook}
           />
         </section>
 

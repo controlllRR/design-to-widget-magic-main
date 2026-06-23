@@ -6,8 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import profile0 from "@/assets/generation/profile-0.png";
-import profile1 from "@/assets/generation/profile-1.png";
+import profileDefault from "@/assets/generation/profile-default.png";
 import { GENERATION_HERO } from "@/components/widget/screens/generation/data";
 
 export interface SavedProfileSnapshot {
@@ -16,55 +15,145 @@ export interface SavedProfileSnapshot {
   modelId?: string | null;
 }
 
-export type ProfileAvatarItem = { src: string; kind: "photo" | "add" };
+export interface WidgetProfile {
+  id: string;
+  avatarImage: string;
+  heroImage: string;
+  isDefault?: boolean;
+  modelId?: string | null;
+}
 
 interface WidgetProfileContextValue {
-  configuringProfileIndex: number;
-  setConfiguringProfileIndex: (index: number) => void;
+  profiles: WidgetProfile[];
+  activeProfileIndex: number;
+  setActiveProfileIndex: (index: number) => void;
+  deleteActiveProfile: () => void;
+  updateProfile: (index: number, profile: SavedProfileSnapshot) => void;
   saveProfile: (profile: SavedProfileSnapshot) => void;
   resetModelHero: () => void;
   heroImage: string;
   headerAvatar: string;
+  /** @deprecated use activeProfileIndex */
+  configuringProfileIndex: number;
+  /** @deprecated use setActiveProfileIndex */
+  setConfiguringProfileIndex: (index: number) => void;
 }
 
 const WidgetProfileContext = createContext<WidgetProfileContextValue | null>(null);
 
+const DEFAULT_PROFILE_ID = "default";
 const DEFAULT_HERO = GENERATION_HERO.generation;
 
+export function profileAvatarImageStyle(): {
+  objectFit: "cover";
+  objectPosition: string;
+} {
+  return {
+    objectFit: "cover",
+    objectPosition: "center",
+  };
+}
+
+function createDefaultProfile(): WidgetProfile {
+  return {
+    id: DEFAULT_PROFILE_ID,
+    avatarImage: profileDefault,
+    heroImage: DEFAULT_HERO,
+    isDefault: true,
+  };
+}
+
 export function WidgetProfileProvider({ children }: { children: ReactNode }) {
-  const [modelHeroImage, setModelHeroImage] = useState<string | null>(null);
-  const [configuringProfileIndex, setConfiguringProfileIndex] = useState(0);
+  const [profiles, setProfiles] = useState<WidgetProfile[]>([createDefaultProfile()]);
+  const [activeProfileIndex, setActiveProfileIndex] = useState(0);
 
   const resetModelHero = useCallback(() => {
-    setModelHeroImage(null);
-    setConfiguringProfileIndex(0);
+    setProfiles([createDefaultProfile()]);
+    setActiveProfileIndex(0);
   }, []);
 
-  const saveProfile = useCallback((profile: SavedProfileSnapshot) => {
-    if (profile.photoMode === "model") {
-      setModelHeroImage(profile.portraitImage);
-    } else {
-      setModelHeroImage(null);
-    }
-    setConfiguringProfileIndex(0);
+  const addModelProfile = useCallback((profile: SavedProfileSnapshot) => {
+    if (profile.photoMode !== "model" || !profile.portraitImage) return;
+
+    const id = `model-${profile.modelId ?? "custom"}-${Date.now()}`;
+    const newProfile: WidgetProfile = {
+      id,
+      avatarImage: profile.portraitImage,
+      heroImage: profile.portraitImage,
+      modelId: profile.modelId,
+    };
+
+    setProfiles((prev) => {
+      const next = [...prev, newProfile];
+      setActiveProfileIndex(next.length - 1);
+      return next;
+    });
   }, []);
 
-  const heroImage = modelHeroImage ?? DEFAULT_HERO;
+  const saveProfile = useCallback(
+    (profile: SavedProfileSnapshot) => {
+      if (profile.photoMode === "model") {
+        addModelProfile(profile);
+      }
+    },
+    [addModelProfile],
+  );
 
-  const headerAvatar =
-    configuringProfileIndex === 1 ? profile1 : profile0;
+  const deleteActiveProfile = useCallback(() => {
+    const active = profiles[activeProfileIndex];
+    if (!active || active.isDefault || profiles.length <= 1) return;
+
+    const next = profiles.filter((_, i) => i !== activeProfileIndex);
+    setProfiles(next);
+    setActiveProfileIndex(Math.min(activeProfileIndex, next.length - 1));
+  }, [profiles, activeProfileIndex]);
+
+  const updateProfile = useCallback(
+    (index: number, profile: SavedProfileSnapshot) => {
+      if (profile.photoMode !== "model" || !profile.portraitImage) {
+        setActiveProfileIndex(index);
+        return;
+      }
+
+      setProfiles((prev) =>
+        prev.map((p, i) => {
+          if (i !== index) return p;
+          return {
+            ...p,
+            avatarImage: profile.portraitImage,
+            heroImage: profile.portraitImage,
+            modelId: profile.modelId,
+          };
+        }),
+      );
+      setActiveProfileIndex(index);
+    },
+    [],
+  );
+
+  const activeProfile = profiles[activeProfileIndex] ?? profiles[0];
+  const heroImage = activeProfile?.heroImage ?? DEFAULT_HERO;
+  const headerAvatar = activeProfile?.avatarImage ?? profileDefault;
 
   const value = useMemo(
     (): WidgetProfileContextValue => ({
-      configuringProfileIndex,
-      setConfiguringProfileIndex,
+      profiles,
+      activeProfileIndex,
+      setActiveProfileIndex,
+      deleteActiveProfile,
+      updateProfile,
       saveProfile,
       resetModelHero,
       heroImage,
       headerAvatar,
+      configuringProfileIndex: activeProfileIndex,
+      setConfiguringProfileIndex: setActiveProfileIndex,
     }),
     [
-      configuringProfileIndex,
+      profiles,
+      activeProfileIndex,
+      deleteActiveProfile,
+      updateProfile,
       saveProfile,
       resetModelHero,
       heroImage,

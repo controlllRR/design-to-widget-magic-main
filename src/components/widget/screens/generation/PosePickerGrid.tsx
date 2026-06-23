@@ -3,15 +3,27 @@ import {
   POSE_LABELS,
   POSE_ROW_1,
   POSE_ROW_2,
-  PROFILE_AVATARS,
+  profileAdd,
   type PoseId,
 } from "./data";
-import type { ProfileAvatarItem } from "@/widget/WidgetProfileContext";
+import profileEditPen from "@/assets/generation/profile-edit-pen.svg";
+import {
+  profileAvatarImageStyle,
+  type WidgetProfile,
+} from "@/widget/WidgetProfileContext";
 import {
   selectionLineArtIconFilter,
   selectionTileStyle,
 } from "@/components/widget/ui/selectionTile";
 import { useWidgetConfig } from "@/widget/config";
+
+/** Figma `723:3184` — бейдж pen-01 на User-photo 50×50. */
+const EDIT_BADGE = {
+  size: 24,
+  icon: 16,
+  top: -2,
+  left: 30,
+} as const;
 
 function PoseThumb({
   id,
@@ -92,48 +104,99 @@ export function PosePickerGrid({
 }
 
 export function ProfileAvatarPicker({
-  avatars = PROFILE_AVATARS,
+  profiles,
   selected,
   onSelect,
+  onAdd,
+  onEdit,
+  editLabel,
+  addLabel,
 }: {
-  avatars?: readonly ProfileAvatarItem[];
+  profiles: readonly WidgetProfile[];
   selected: number;
   onSelect: (index: number) => void;
+  onAdd?: () => void;
+  onEdit?: (index: number) => void;
+  editLabel?: string;
+  addLabel?: string;
 }) {
   return (
-    <div className="flex items-center" style={{ gap: 12 }}>
-      {avatars.map((item, i) => {
+    <div className="flex items-center flex-wrap" style={{ gap: 12 }}>
+      {profiles.map((profile, i) => {
         const isSelected = selected === i;
-        const isPhoto = item.kind === "photo";
+        const avatarStyle = profileAvatarImageStyle();
 
         return (
-          <button
-            key={i}
-            type="button"
-            onClick={() => onSelect(i)}
-            aria-pressed={isSelected}
-            aria-label={isPhoto ? `Профиль ${i + 1}` : "Добавить профиль"}
-            className="shrink-0 relative flex items-center justify-center rounded-full"
-            style={{
-              width: 50,
-              height: 50,
-              overflow: "hidden",
-              opacity: isPhoto && !isSelected && i !== 1 ? 0.55 : 1,
-            }}
+          <div
+            key={profile.id}
+            className="relative shrink-0"
+            style={{ width: 50, height: 50 }}
           >
-            <img
-              src={item.src}
-              alt=""
-              className="block w-full h-full rounded-full"
+            <button
+              type="button"
+              onClick={() => onSelect(i)}
+              aria-pressed={isSelected}
+              aria-label={`Профиль ${i + 1}`}
+              className="absolute inset-0 flex items-center justify-center rounded-full overflow-hidden"
               style={{
-                objectFit: "cover",
-                objectPosition: "center",
+                opacity: !isSelected ? 0.55 : 1,
               }}
-              draggable={false}
-            />
-          </button>
+            >
+              <img
+                src={profile.avatarImage}
+                alt=""
+                className="block w-full h-full rounded-full"
+                style={avatarStyle}
+                draggable={false}
+              />
+            </button>
+            {onEdit ? (
+              <button
+                type="button"
+                aria-label={editLabel ?? "Редактировать профиль"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(i);
+                }}
+                className="absolute z-[1] flex items-center justify-center"
+                style={{
+                  top: EDIT_BADGE.top,
+                  left: EDIT_BADGE.left,
+                  width: EDIT_BADGE.size,
+                  height: EDIT_BADGE.size,
+                  borderRadius: 20,
+                  backgroundColor: "#ffffff",
+                  padding: 4,
+                }}
+              >
+                <img
+                  src={profileEditPen}
+                  alt=""
+                  width={EDIT_BADGE.icon}
+                  height={EDIT_BADGE.icon}
+                  draggable={false}
+                />
+              </button>
+            ) : null}
+          </div>
         );
       })}
+      {onAdd ? (
+        <button
+          type="button"
+          aria-label={addLabel ?? "Добавить профиль"}
+          onClick={onAdd}
+          className="shrink-0 flex items-center justify-center rounded-full"
+          style={{ width: 50, height: 50 }}
+        >
+          <img
+            src={profileAdd}
+            alt=""
+            className="block w-full h-full rounded-full"
+            draggable={false}
+          />
+        </button>
+      ) : null}
     </div>
   );
 }

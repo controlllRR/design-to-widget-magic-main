@@ -609,6 +609,7 @@ export const defaultWidgetConfig: WidgetConfig = {
         configuring: {
           selectProfile: "выберите профиль",
           selectPose: "выберите вид (ракурс)",
+          editProfile: "редактировать профиль",
         },
         warning: {
           title: "Вы действительно хотите очистить весь образ?",
@@ -1211,6 +1212,7 @@ export const defaultWidgetConfig: WidgetConfig = {
         configuring: {
           selectProfile: "select profile",
           selectPose: "select view (angle)",
+          editProfile: "edit profile",
         },
         warning: {
           title: "Are you sure you want to clear the entire outfit?",

@@ -62,7 +62,8 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
 function WidgetRoot({ initialScreen }: WidgetProps = {}) {
   const { config, effectiveTheme, t } = useWidgetConfig();
   const cssVars = useWidgetCssVars();
-  const { saveProfile, heroImage, resetModelHero } = useWidgetProfile();
+  const { saveProfile, updateProfile, heroImage, resetModelHero, profiles, setActiveProfileIndex } =
+    useWidgetProfile();
 
   const [screen, setScreen] = useState<WidgetRoute>(
     initialScreen ?? (config.splash.enabled ? "splash" : "start-page"),
@@ -81,6 +82,8 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
   const [generationLoadingVariant, setGenerationLoadingVariant] = useState<
     "v1" | "v2"
   >("v1");
+  const [addingModelProfile, setAddingModelProfile] = useState(false);
+  const [editingProfileIndex, setEditingProfileIndex] = useState<number | null>(null);
   const [overlayRoot, setOverlayRoot] = useState<HTMLDivElement | null>(null);
   const generationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -255,9 +258,38 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
       {screen === "create-profile-empty" && (
         <CreateProfile
           variant="empty"
+          initialPhotoMode={
+            editingProfileIndex !== null && profiles[editingProfileIndex]?.modelId
+              ? "model"
+              : addingModelProfile
+                ? "model"
+                : undefined
+          }
+          initialModelId={
+            editingProfileIndex !== null
+              ? profiles[editingProfileIndex]?.modelId
+              : undefined
+          }
           onOpenMenu={() => navigate("user-menu")}
-          onClose={() => navigate("start-page")}
-          onContinue={continueToConfiguring(saveProfile, navigate)}
+          onClose={() => {
+            if (addingModelProfile || editingProfileIndex !== null) {
+              setAddingModelProfile(false);
+              setEditingProfileIndex(null);
+              navigate("configuring-generation");
+              return;
+            }
+            navigate("start-page");
+          }}
+          onContinue={(profile) => {
+            if (editingProfileIndex !== null) {
+              updateProfile(editingProfileIndex, profile);
+              setEditingProfileIndex(null);
+            } else {
+              saveProfile(profile);
+            }
+            setAddingModelProfile(false);
+            navigate("configuring-generation");
+          }}
         />
       )}
       {screen === "create-profile-filled" && (
@@ -327,6 +359,19 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate(configReturnRoute)}
           onGenerate={runGeneration}
+          onAddProfile={() => {
+            setAddingModelProfile(true);
+            setEditingProfileIndex(null);
+            setConfigReturnRoute("configuring-generation");
+            navigate("create-profile-empty");
+          }}
+          onEditProfile={(index) => {
+            setEditingProfileIndex(index);
+            setAddingModelProfile(false);
+            setActiveProfileIndex(index);
+            setConfigReturnRoute("configuring-generation");
+            navigate("create-profile-empty");
+          }}
         />
       )}
       {screen === "preloader-v1" && (

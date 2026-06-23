@@ -756,6 +756,7 @@ export interface I18nDictionary {
     configuring: {
       selectProfile: string;
       selectPose: string;
+      editProfile: string;
     };
     warning: {
       title: string;

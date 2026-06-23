@@ -1,8 +1,8 @@
 import heroConfiguring from "@/assets/generation/hero-configuring.png";
 import heroGeneration from "@/assets/generation/hero-generation.png";
-import profile0 from "@/assets/generation/profile-0.png";
-import profile1 from "@/assets/generation/profile-1.png";
 import profileAdd from "@/assets/generation/profile-add.png";
+
+export { profileAdd };
 
 import poseFront from "@/assets/generation/pose-front.png";
 import poseThreeQuarter from "@/assets/generation/pose-three-quarter.png";
@@ -49,12 +49,6 @@ export const GENERATION_HERO = {
   configuring: heroConfiguring,
   generation: heroGeneration,
 } as const;
-
-export const PROFILE_AVATARS = [
-  { src: profile0, kind: "photo" as const },
-  { src: profile1, kind: "photo" as const },
-  { src: profileAdd, kind: "add" as const },
-] as const;
 
 /** Состав образа — Figma `674:4769` / `1157:14519` (название + категория). */
 export const GENERATION_OUTFIT: OutfitItem[] = [
