@@ -62,7 +62,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
 function WidgetRoot({ initialScreen }: WidgetProps = {}) {
   const { config, effectiveTheme, t } = useWidgetConfig();
   const cssVars = useWidgetCssVars();
-  const { saveProfile, heroImage } = useWidgetProfile();
+  const { saveProfile, heroImage, resetModelHero } = useWidgetProfile();
 
   const [screen, setScreen] = useState<WidgetRoute>(
     initialScreen ?? (config.splash.enabled ? "splash" : "start-page"),
@@ -110,6 +110,9 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
     if (to !== "generation-page" && generationLoading) {
       clearGenerationTimer();
       setGenerationLoading(false);
+    }
+    if (to === "start-page") {
+      resetModelHero();
     }
     console.info("[VirtuFit] navigation", { from: screen, to });
     setScreen(to);
@@ -212,22 +215,28 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
         <StartPage
           onOpenUserMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onStart={(v) =>
-            navigate(
-              v === "pro" ? "create-profile-empty" : "configuring-generation",
-            )
-          }
+          onStart={(v) => {
+            if (v === "pro") {
+              navigate("create-profile-empty");
+              return;
+            }
+            resetModelHero();
+            navigate("configuring-generation");
+          }}
         />
       )}
       {screen === "start-page-alt" && (
         <StartPageAlt
           onOpenUserMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onStart={(v) =>
-            navigate(
-              v === "pro" ? "create-profile-empty" : "configuring-generation",
-            )
-          }
+          onStart={(v) => {
+            if (v === "pro") {
+              navigate("create-profile-empty");
+              return;
+            }
+            resetModelHero();
+            navigate("configuring-generation");
+          }}
         />
       )}
       {screen === "user-menu" && (
@@ -280,7 +289,10 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           <UploadPhoto
             onOpenMenu={() => navigate("user-menu")}
             onClose={() => navigate("start-page")}
-            onContinue={() => navigate("configuring-generation")}
+            onContinue={() => {
+              resetModelHero();
+              navigate("configuring-generation");
+            }}
             onShowInfo={() => setInfoOpen(true)}
           />
           <InfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
@@ -291,7 +303,10 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           variant="invalid"
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onContinue={() => navigate("configuring-generation")}
+          onContinue={() => {
+            resetModelHero();
+            navigate("configuring-generation");
+          }}
         />
       )}
       {screen === "info-modal" && (
@@ -299,7 +314,10 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           <UploadPhoto
             onOpenMenu={() => navigate("user-menu")}
             onClose={() => navigate("start-page")}
-            onContinue={() => navigate("configuring-generation")}
+            onContinue={() => {
+              resetModelHero();
+              navigate("configuring-generation");
+            }}
           />
           <InfoModal onClose={() => navigate("upload-photo")} />
         </div>
@@ -350,7 +368,10 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
         <MyImages
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onNewTryOn={() => navigate("configuring-generation")}
+          onNewTryOn={() => {
+            resetModelHero();
+            navigate("configuring-generation");
+          }}
           onOpenTryOn={() => navigate("generation-page")}
         />
       )}
@@ -359,7 +380,10 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           initialDeleteWarning
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onNewTryOn={() => navigate("configuring-generation")}
+          onNewTryOn={() => {
+            resetModelHero();
+            navigate("configuring-generation");
+          }}
           onOpenTryOn={() => navigate("generation-page")}
         />
       )}
