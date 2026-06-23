@@ -517,59 +517,111 @@ export function CreateProfile({
           <>
             {/* Looks tabs */}
             <Section>
-              <div
-                className="flex items-end w-full min-w-0"
-                style={{ gap: "var(--vf-sp-12)" }}
-              >
-                <div className="flex-1 min-w-0">
-                  <SegmentedTabs
-                    variant="underline"
-                    value={String(activeLook)}
-                    onChange={(v) => setActiveLook(Number(v))}
-                    items={looks.map((n) => ({
-                      id: String(n),
-                      label: `${t_cp.lookTab} ${n}`,
-                    }))}
-                  />
-                </div>
-                {looks.length > 1 ? (
+              <div className="flex flex-col w-full min-w-0">
+                <div
+                  className="flex items-end w-full min-w-0"
+                  style={{ gap: "var(--vf-sp-12)" }}
+                >
+                  <div
+                    role="tablist"
+                    aria-label={t_cp.lookTab}
+                    className="flex items-end min-w-0 flex-wrap"
+                    style={{ gap: "var(--vf-sp-12)" }}
+                  >
+                    {looks.map((n) => {
+                      const active = activeLook === n;
+                      return (
+                        <div
+                          key={n}
+                          className="flex items-end shrink-0"
+                          style={{ gap: "var(--vf-sp-6)" }}
+                        >
+                          <button
+                            type="button"
+                            role="tab"
+                            aria-selected={active}
+                            onClick={() => setActiveLook(n)}
+                            className="relative shrink-0 vf-segment-pill"
+                            style={{
+                              paddingBlock: "var(--vf-sp-8)",
+                              fontFamily: "var(--vf-font-body)",
+                              fontSize: "var(--vf-fs-13)",
+                              fontWeight: active ? 600 : 400,
+                              color: active
+                                ? "var(--vf-text)"
+                                : "color-mix(in oklab, var(--vf-text) 60%, transparent)",
+                            }}
+                          >
+                            {t_cp.lookTab} {n}
+                            {active ? (
+                              <span
+                                aria-hidden
+                                className="absolute left-0 right-0"
+                                style={{
+                                  bottom: 0,
+                                  height: 2,
+                                  backgroundColor: "var(--vf-text)",
+                                }}
+                              />
+                            ) : null}
+                          </button>
+                          {active && looks.length > 1 ? (
+                            <button
+                              type="button"
+                              aria-label={t_cp.deleteLook}
+                              onClick={deleteActiveLook}
+                              className="flex items-center justify-center shrink-0"
+                              style={{
+                                width: 24,
+                                height: 24,
+                                marginBottom: "var(--vf-sp-8)",
+                              }}
+                            >
+                              <Trash2
+                                strokeWidth={1.5}
+                                style={{
+                                  width: 14,
+                                  height: 14,
+                                  color: "var(--vf-text)",
+                                }}
+                              />
+                            </button>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
                   <button
                     type="button"
-                    aria-label={t_cp.deleteLook}
-                    onClick={deleteActiveLook}
-                    className="flex items-center justify-center shrink-0"
+                    aria-label={t_cp.addLook}
+                    onClick={() => {
+                      const next = (looks.at(-1) ?? 0) + 1;
+                      setLooks([...looks, next]);
+                      setActiveLook(next);
+                    }}
+                    className="flex items-center justify-center shrink-0 ml-auto"
                     style={{
                       width: 28,
                       height: 28,
                       marginBottom: "var(--vf-sp-6)",
                     }}
                   >
-                    <Trash2
+                    <Plus
                       strokeWidth={1.5}
-                      style={{ width: 16, height: 16, color: "var(--vf-text)" }}
+                      style={{ width: 18, height: 18, color: "var(--vf-text)" }}
                     />
                   </button>
-                ) : null}
-                <button
-                  type="button"
-                  aria-label={t_cp.addLook}
-                  onClick={() => {
-                    const next = (looks.at(-1) ?? 0) + 1;
-                    setLooks([...looks, next]);
-                    setActiveLook(next);
-                  }}
-                  className="flex items-center justify-center shrink-0"
+                </div>
+                <div
+                  aria-hidden
+                  className="w-full"
                   style={{
-                    width: 28,
-                    height: 28,
-                    marginBottom: "var(--vf-sp-6)",
+                    height: 1,
+                    marginTop: "var(--vf-sp-4)",
+                    backgroundColor:
+                      "color-mix(in oklab, var(--vf-text) 12%, transparent)",
                   }}
-                >
-                  <Plus
-                    strokeWidth={1.5}
-                    style={{ width: 18, height: 18, color: "var(--vf-text)" }}
-                  />
-                </button>
+                />
               </div>
             </Section>
 
