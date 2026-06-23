@@ -62,10 +62,9 @@ export function ConfiguringGeneration({
 
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
         <div
-          className="overflow-hidden shrink-0"
+          className="relative w-full overflow-hidden shrink-0"
           style={{
             height: "var(--vf-h-configuring-hero)",
-            borderRadius: 0,
             backgroundColor: "var(--vf-card-hero)",
           }}
         >
