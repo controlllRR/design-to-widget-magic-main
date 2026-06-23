@@ -1,4 +1,6 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { useWidgetOverlayRoot } from "@/widget/WidgetOverlayContext";
 import { animatedPhaseClass, useAnimatedMount } from "@/components/widget/ui/useAnimatedMount";
 
 export interface AnimatedCenterModalProps {
@@ -25,6 +27,7 @@ export function AnimatedCenterModal({
   zIndex = 50,
   durationMs,
 }: AnimatedCenterModalProps) {
+  const overlayRoot = useWidgetOverlayRoot();
   const { mounted, phase } = useAnimatedMount(open, durationMs);
 
   useEffect(() => {
@@ -38,9 +41,9 @@ export function AnimatedCenterModal({
 
   if (!mounted) return null;
 
-  return (
+  const modal = (
     <div
-      className="absolute inset-0 flex items-center justify-center p-3"
+      className="absolute inset-0 flex items-center justify-center p-3 pointer-events-auto"
       style={{ zIndex }}
       role="dialog"
       aria-modal="true"
@@ -50,17 +53,23 @@ export function AnimatedCenterModal({
         type="button"
         aria-label="Закрыть"
         onClick={onClose}
-        className={`absolute inset-0 ${animatedPhaseClass("vf-anim-backdrop", phase)} ${backdropClassName}`.trim()}
+        className={`absolute inset-0 z-0 ${animatedPhaseClass("vf-anim-backdrop", phase)} ${backdropClassName}`.trim()}
         style={{
           backgroundColor: "color-mix(in oklab, var(--vf-text) 40%, transparent)",
         }}
       />
       <div
-        className={`${animatedPhaseClass("vf-anim-modal relative w-full", phase)} ${panelClassName}`.trim()}
+        className={`${animatedPhaseClass("vf-anim-modal relative z-10 w-full", phase)} ${panelClassName}`.trim()}
         style={panelStyle}
       >
         {children}
       </div>
     </div>
   );
+
+  if (overlayRoot) {
+    return createPortal(modal, overlayRoot);
+  }
+
+  return modal;
 }

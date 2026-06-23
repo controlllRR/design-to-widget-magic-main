@@ -1,5 +1,7 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useWidgetConfig } from "@/widget/config";
+import { useWidgetOverlayRoot } from "@/widget/WidgetOverlayContext";
 import { animatedPhaseClass, useAnimatedMount } from "@/components/widget/ui/useAnimatedMount";
 
 export interface AnimatedSheetShellProps {
@@ -25,6 +27,7 @@ export function AnimatedSheetShell({
   durationMs,
 }: AnimatedSheetShellProps) {
   const { t } = useWidgetConfig();
+  const overlayRoot = useWidgetOverlayRoot();
   const { mounted, phase } = useAnimatedMount(open, durationMs);
 
   useEffect(() => {
@@ -38,25 +41,25 @@ export function AnimatedSheetShell({
 
   if (!mounted) return null;
 
-  return (
+  const sheet = (
     <div
       role="dialog"
       aria-modal="true"
       aria-label={ariaLabel}
-      className="absolute inset-0 flex flex-col"
+      className="absolute inset-0 flex flex-col pointer-events-auto"
       style={{ zIndex, fontFamily: "var(--vf-font-body)" }}
     >
       <button
         type="button"
         aria-label={t.screens.common.close}
         onClick={onClose}
-        className={`absolute inset-0 w-full h-full ${animatedPhaseClass("vf-anim-backdrop", phase)}`}
+        className={`absolute inset-0 w-full h-full z-0 ${animatedPhaseClass("vf-anim-backdrop", phase)}`}
         style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
       />
 
       <div
         className={`${animatedPhaseClass(
-          "vf-anim-sheet relative mt-auto flex flex-col w-full min-w-0",
+          "vf-anim-sheet relative z-10 mt-auto flex flex-col w-full min-w-0",
           phase,
         )} ${panelClassName}`.trim()}
         style={panelStyle}
@@ -65,4 +68,10 @@ export function AnimatedSheetShell({
       </div>
     </div>
   );
+
+  if (overlayRoot) {
+    return createPortal(sheet, overlayRoot);
+  }
+
+  return sheet;
 }

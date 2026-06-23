@@ -24,6 +24,7 @@ import type { TileItem } from "@/components/widget/screens/wardrobe/data";
 import {
   GENERATION_LOADER_MS,
 } from "./screens/generation/useGenerationPreloader";
+import { WidgetOverlayContext } from "@/widget/WidgetOverlayContext";
 
 export interface WidgetProps {
   initialScreen?: WidgetRoute;
@@ -56,6 +57,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
   const [generationLoadingVariant, setGenerationLoadingVariant] = useState<
     "v1" | "v2"
   >("v1");
+  const [overlayRoot, setOverlayRoot] = useState<HTMLDivElement | null>(null);
   const generationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearGenerationTimer = useCallback(() => {
@@ -158,6 +160,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
     >
       <UserMenuPinsProvider>
       <UserMenuNavProvider onSelect={handleMenuSelect}>
+      <WidgetOverlayContext.Provider value={overlayRoot}>
       <div className="relative flex flex-1 flex-col min-h-0 min-w-0 w-full">
       <div
         key={screen}
@@ -427,6 +430,12 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
       )}
       </div>
 
+      <div
+        ref={setOverlayRoot}
+        data-vf-overlay-root
+        className="absolute inset-0 pointer-events-none z-[45]"
+      />
+
       <WarningModal
         open={(warningOpen || screen === "popup-warning") && !generationLoading}
         onCancel={() => {
@@ -455,6 +464,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
         }}
       />
       </div>
+      </WidgetOverlayContext.Provider>
       </UserMenuNavProvider>
       </UserMenuPinsProvider>
     </div>
