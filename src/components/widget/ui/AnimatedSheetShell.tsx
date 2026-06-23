@@ -58,8 +58,8 @@ export function AnimatedSheetShell({
       />
 
       <div
-        className={`${animatedPhaseClass(
-          "vf-anim-sheet relative z-10 mt-auto flex flex-col w-full min-w-0",
+        className={`relative z-10 mt-auto flex flex-col w-full min-w-0 ${animatedPhaseClass(
+          "vf-anim-sheet",
           phase,
         )} ${panelClassName}`.trim()}
         style={panelStyle}

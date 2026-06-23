@@ -59,7 +59,7 @@ export function AnimatedCenterModal({
         }}
       />
       <div
-        className={`${animatedPhaseClass("vf-anim-modal relative z-10 w-full", phase)} ${panelClassName}`.trim()}
+        className={`relative z-10 w-full ${animatedPhaseClass("vf-anim-modal", phase)} ${panelClassName}`.trim()}
         style={panelStyle}
       >
         {children}

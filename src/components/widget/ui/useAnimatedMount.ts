@@ -32,6 +32,7 @@ export function useAnimatedMount(open: boolean, durationMs = DEFAULT_MS) {
   };
 }
 
+/** @param base один CSS-класс анимации, без tailwind-утилит. */
 export function animatedPhaseClass(base: string, phase: AnimatedPhase): string {
   if (phase === "hidden") return base;
   if (phase === "enter") return `${base} ${base}--from`;
