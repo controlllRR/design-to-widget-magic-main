@@ -77,6 +77,8 @@ export interface GenerationPageProps {
   onInitialGeneratingConsumed?: () => void;
   /** Выбранный набор из гардероба — заменяет состав образа. */
   appliedSet?: TileItem | null;
+  /** Портрет/модель из профиля — hero на экране генерации. */
+  heroImage?: string;
 }
 
 /** Generation page — Figma nEJeT6wB7wu3XOya5ZMPPH `674:4649` / board `59:2578`. */
@@ -103,6 +105,7 @@ export function GenerationPage({
   initialConfigItemId,
   initialClearItemWarning = false,
   appliedSet = null,
+  heroImage,
 }: GenerationPageProps) {
   const { t } = useWidgetConfig();
   const g = t.screens.generation;
@@ -242,7 +245,7 @@ export function GenerationPage({
     window.setTimeout(() => setShareNoticeLocal(null), 2200);
   };
 
-  const lookImageUrl = GENERATION_HERO.generation;
+  const lookImageUrl = heroImage ?? GENERATION_HERO.generation;
   const lookPageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const handleCopyLink = async () => {
@@ -305,6 +308,7 @@ export function GenerationPage({
           height={516}
           wearRails
           disabled={isGenerating}
+          src={lookImageUrl}
           selectedWearId={selectedWearId}
           slideIndex={slideIndex}
           onSlideChange={setSlideIndex}

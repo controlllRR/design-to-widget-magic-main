@@ -1,6 +1,7 @@
 ﻿import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
+import { useWidgetProfile } from "@/widget/WidgetProfileContext";
 import { WidgetHeader } from "@/components/widget/WidgetHeader";
 import { Watermark } from "@/components/widget/Watermark";
 import { type PoseId } from "@/components/widget/screens/generation/data";
@@ -29,7 +30,12 @@ export function ConfiguringGeneration({
 }: ConfiguringGenerationProps) {
   const { t } = useWidgetConfig();
   const cfg = t.screens.configuring;
-  const [profileIndex, setProfileIndex] = useState(0);
+  const {
+    heroImage,
+    profileAvatars,
+    configuringProfileIndex,
+    setConfiguringProfileIndex,
+  } = useWidgetProfile();
   const [selectedPoses, setSelectedPoses] = useState<ReadonlySet<PoseId>>(
     () => new Set<PoseId>(["front", "three-quarter", "back"]),
   );
@@ -64,7 +70,7 @@ export function ConfiguringGeneration({
             backgroundColor: "var(--vf-card-hero)",
           }}
         >
-          <ConfiguringHeroPreview />
+          <ConfiguringHeroPreview src={heroImage} />
         </div>
 
         <section
@@ -77,7 +83,11 @@ export function ConfiguringGeneration({
           <h2 className="mb-3" style={sectionHeadingStyle}>
             {cfg.selectProfile}
           </h2>
-          <ProfileAvatarPicker selected={profileIndex} onSelect={setProfileIndex} />
+          <ProfileAvatarPicker
+            avatars={profileAvatars}
+            selected={configuringProfileIndex}
+            onSelect={setConfiguringProfileIndex}
+          />
         </section>
 
         <div

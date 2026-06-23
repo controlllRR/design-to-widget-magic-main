@@ -1,5 +1,4 @@
 import {
-  GENERATION_HERO,
   POSE_IMAGES,
   POSE_LABELS,
   POSE_ROW_1,
@@ -7,6 +6,7 @@ import {
   PROFILE_AVATARS,
   type PoseId,
 } from "./data";
+import type { ProfileAvatarItem } from "@/widget/WidgetProfileContext";
 import {
   selectionLineArtIconFilter,
   selectionTileStyle,
@@ -92,15 +92,17 @@ export function PosePickerGrid({
 }
 
 export function ProfileAvatarPicker({
+  avatars = PROFILE_AVATARS,
   selected,
   onSelect,
 }: {
+  avatars?: readonly ProfileAvatarItem[];
   selected: number;
   onSelect: (index: number) => void;
 }) {
   return (
     <div className="flex items-center" style={{ gap: 12 }}>
-      {PROFILE_AVATARS.map((item, i) => {
+      {avatars.map((item, i) => {
         const isSelected = selected === i;
         const isPhoto = item.kind === "photo";
 
@@ -136,10 +138,10 @@ export function ProfileAvatarPicker({
   );
 }
 
-export function ConfiguringHeroPreview() {
+export function ConfiguringHeroPreview({ src }: { src: string }) {
   return (
     <img
-      src={GENERATION_HERO.configuring}
+      src={src}
       alt=""
       className="w-full h-full object-contain object-center"
       draggable={false}

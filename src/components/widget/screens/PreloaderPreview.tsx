@@ -1,4 +1,5 @@
 import { useWidgetConfig } from "@/widget/config";
+import { useWidgetProfile } from "@/widget/WidgetProfileContext";
 import { WidgetHeader } from "@/components/widget/WidgetHeader";
 import { Watermark } from "@/components/widget/Watermark";
 import { PRELOADER_OUTFIT } from "@/components/widget/screens/generation/data";
@@ -19,6 +20,7 @@ export interface PreloaderPreviewProps {
 /** Preloader Preview — Figma `1183:16399` / `1192:16812`. */
 export function PreloaderPreview({ variant = "v1", onDone }: PreloaderPreviewProps) {
   const { t } = useWidgetConfig();
+  const { heroImage } = useWidgetProfile();
   const loading = true;
 
   return (
@@ -30,6 +32,7 @@ export function PreloaderPreview({ variant = "v1", onDone }: PreloaderPreviewPro
           height={516}
           wearRails
           disabled
+          src={heroImage}
           overlay={<GenerationPreloaderOverlay label={t.screens.preloader.label} />}
         />
 

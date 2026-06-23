@@ -25,9 +25,24 @@ import {
   GENERATION_LOADER_MS,
 } from "./screens/generation/useGenerationPreloader";
 import { WidgetOverlayContext } from "@/widget/WidgetOverlayContext";
+import {
+  WidgetProfileProvider,
+  useWidgetProfile,
+  type SavedProfileSnapshot,
+} from "@/widget/WidgetProfileContext";
 
 export interface WidgetProps {
   initialScreen?: WidgetRoute;
+}
+
+function continueToConfiguring(
+  saveProfile: (profile: SavedProfileSnapshot) => void,
+  navigate: (to: WidgetRoute) => void,
+) {
+  return (profile: SavedProfileSnapshot) => {
+    saveProfile(profile);
+    navigate("configuring-generation");
+  };
 }
 
 /**
@@ -37,8 +52,17 @@ export interface WidgetProps {
  *  - data-vf-theme для возможных скоупных стилей.
  */
 export default function Widget({ initialScreen }: WidgetProps = {}) {
+  return (
+    <WidgetProfileProvider>
+      <WidgetRoot initialScreen={initialScreen} />
+    </WidgetProfileProvider>
+  );
+}
+
+function WidgetRoot({ initialScreen }: WidgetProps = {}) {
   const { config, effectiveTheme, t } = useWidgetConfig();
   const cssVars = useWidgetCssVars();
+  const { saveProfile, heroImage } = useWidgetProfile();
 
   const [screen, setScreen] = useState<WidgetRoute>(
     initialScreen ?? (config.splash.enabled ? "splash" : "start-page"),
@@ -142,6 +166,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
     generatingVariant: generationLoadingVariant,
     onTryOn: () => startGenerationLoading("v1"),
     appliedSet: appliedWardrobeSet,
+    heroImage,
   };
 
   const showReplaceOutfitWarning =
@@ -223,7 +248,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
           variant="empty"
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onContinue={() => navigate("configuring-generation")}
+          onContinue={continueToConfiguring(saveProfile, navigate)}
         />
       )}
       {screen === "create-profile-filled" && (
@@ -231,7 +256,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
           variant="filled"
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onContinue={() => navigate("configuring-generation")}
+          onContinue={continueToConfiguring(saveProfile, navigate)}
         />
       )}
       {screen === "create-profile-errors" && (
@@ -247,7 +272,7 @@ export default function Widget({ initialScreen }: WidgetProps = {}) {
           initialScrollToParams
           onOpenMenu={() => navigate("user-menu")}
           onClose={() => navigate("start-page")}
-          onContinue={() => navigate("configuring-generation")}
+          onContinue={continueToConfiguring(saveProfile, navigate)}
         />
       )}
       {screen === "upload-photo" && (

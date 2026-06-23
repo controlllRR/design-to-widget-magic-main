@@ -53,13 +53,14 @@ import {
   PROFILE_MODEL_PREVIEW_COUNT,
 } from "@/widget/config/profile-models";
 import { secondaryButtonStyle } from "@/components/widget/ui/screenShell";
+import type { SavedProfileSnapshot } from "@/widget/WidgetProfileContext";
 
 interface CreateProfileProps {
   onOpenMenu?: () => void;
   onClose?: () => void;
   /** empty — дефолт; filled — заполненный; errors — состояние валидации (Figma). */
   variant?: "empty" | "filled" | "errors";
-  onContinue?: () => void;
+  onContinue?: (profile: SavedProfileSnapshot) => void;
   onDeleteProfile?: () => void;
   /** Gallery QA: проскроллить к параметрам — Figma `1211:25283`. */
   initialScrollToParams?: boolean;
@@ -329,8 +330,12 @@ export function CreateProfile({
       breastSize,
       shoulderShape,
     });
-    if (!canSubmit) return;
-    onContinue?.();
+    if (!canSubmit || !portraitAvatar) return;
+    onContinue?.({
+      portraitImage: portraitAvatar,
+      photoMode,
+      modelId: photoMode === "model" ? selectedModelId : null,
+    });
   };
 
   const photoSlots = cp.photoSlots.filter((s) => s.enabled);
