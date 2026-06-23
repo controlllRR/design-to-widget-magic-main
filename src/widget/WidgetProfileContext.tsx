@@ -7,8 +7,6 @@ import {
 } from "react";
 import profile0 from "@/assets/generation/profile-0.png";
 import profile1 from "@/assets/generation/profile-1.png";
-import profileAdd from "@/assets/generation/profile-add.png";
-import { GENERATION_HERO } from "@/components/widget/screens/generation/data";
 
 export interface SavedProfileSnapshot {
   portraitImage: string;
@@ -19,13 +17,14 @@ export interface SavedProfileSnapshot {
 export type ProfileAvatarItem = { src: string; kind: "photo" | "add" };
 
 interface WidgetProfileContextValue {
+  /** Полноразмерное фото модели для hero (конфигурация + генерация). */
   portraitImage: string;
   configuringProfileIndex: number;
   setConfiguringProfileIndex: (index: number) => void;
   saveProfile: (profile: SavedProfileSnapshot) => void;
   heroImage: string;
+  /** Маленький аватар только для шапки «профиль». */
   headerAvatar: string;
-  profileAvatars: readonly ProfileAvatarItem[];
 }
 
 const WidgetProfileContext = createContext<WidgetProfileContextValue | null>(null);
@@ -39,20 +38,10 @@ export function WidgetProfileProvider({ children }: { children: ReactNode }) {
     setConfiguringProfileIndex(0);
   };
 
-  const heroImage = useMemo(() => {
-    if (configuringProfileIndex === 0) return portraitImage;
-    if (configuringProfileIndex === 1) return profile1;
-    return GENERATION_HERO.generation;
-  }, [portraitImage, configuringProfileIndex]);
+  const heroImage = portraitImage;
 
-  const profileAvatars = useMemo(
-    (): readonly ProfileAvatarItem[] => [
-      { src: portraitImage, kind: "photo" },
-      { src: profile1, kind: "photo" },
-      { src: profileAdd, kind: "add" },
-    ],
-    [portraitImage],
-  );
+  const headerAvatar =
+    configuringProfileIndex === 1 ? profile1 : profile0;
 
   const value = useMemo(
     (): WidgetProfileContextValue => ({
@@ -61,10 +50,9 @@ export function WidgetProfileProvider({ children }: { children: ReactNode }) {
       setConfiguringProfileIndex,
       saveProfile,
       heroImage,
-      headerAvatar: portraitImage,
-      profileAvatars,
+      headerAvatar,
     }),
-    [portraitImage, configuringProfileIndex, heroImage, profileAvatars],
+    [portraitImage, configuringProfileIndex, heroImage, headerAvatar],
   );
 
   return (

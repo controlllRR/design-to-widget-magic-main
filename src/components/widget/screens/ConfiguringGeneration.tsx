@@ -32,7 +32,6 @@ export function ConfiguringGeneration({
   const cfg = t.screens.configuring;
   const {
     heroImage,
-    profileAvatars,
     configuringProfileIndex,
     setConfiguringProfileIndex,
   } = useWidgetProfile();
@@ -84,7 +83,6 @@ export function ConfiguringGeneration({
             {cfg.selectProfile}
           </h2>
           <ProfileAvatarPicker
-            avatars={profileAvatars}
             selected={configuringProfileIndex}
             onSelect={setConfiguringProfileIndex}
           />

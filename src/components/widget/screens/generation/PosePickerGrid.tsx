@@ -143,7 +143,7 @@ export function ConfiguringHeroPreview({ src }: { src: string }) {
     <img
       src={src}
       alt=""
-      className="w-full h-full object-contain object-center"
+      className="w-full h-full object-cover object-top"
       draggable={false}
     />
   );
