@@ -290,6 +290,7 @@ export function GenerationPage({
         onProfile={onOpenMenu}
         onClose={onClose}
         profileLabel={t.start.profile}
+        showPinnedShortcuts={false}
       />
 
       <div className="relative flex flex-col flex-1 min-h-0 overflow-y-auto pb-2">
@@ -301,6 +302,7 @@ export function GenerationPage({
           />
         ) : null}
         <GenerationHero
+          height={516}
           wearRails
           disabled={isGenerating}
           selectedWearId={selectedWearId}

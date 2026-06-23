@@ -145,7 +145,7 @@
     --vf-fs-26: clamp(22px, 7.1cqw, 26px);
 
     /* heights */
-    --vf-h-hero: clamp(280px, 72cqw, 420px);
+    --vf-h-hero: clamp(360px, 56dvh, 420px);
     --vf-h-card: clamp(96px, 32cqw, 158px);
     --vf-start-section-gap: var(--vf-sp-24);
     /* Configuring Generation hero — Figma 723:3180 */

@@ -146,7 +146,10 @@ export function GenerationHeroOverlay({
 
   return (
     <>
-      <div className="vf-hero-rail vf-hero-rail--left" aria-label="Одежда образа">
+      <div
+        className="absolute left-3 top-[22px] bottom-[22px] w-[46px] flex flex-col gap-4 z-10"
+        aria-label="Одежда образа"
+      >
         <div className="flex flex-col gap-1.5">{leftItems.map(railBtn)}</div>
         {leftAdd && railBtn(leftAdd)}
         <div className="flex-1 min-h-0" />
@@ -159,7 +162,10 @@ export function GenerationHeroOverlay({
         </HeroUtilityButton>
       </div>
 
-      <div className="vf-hero-rail vf-hero-rail--right" aria-label="Аксессуары">
+      <div
+        className="absolute right-3 top-[22px] bottom-[22px] w-[46px] flex flex-col gap-4 z-10"
+        aria-label="Аксессуары"
+      >
         <div className="flex flex-col gap-1.5">{rightItems.map(railBtn)}</div>
         {rightAdd && railBtn(rightAdd)}
         {rightLooks && railBtn(rightLooks)}
@@ -169,7 +175,11 @@ export function GenerationHeroOverlay({
         </HeroUtilityButton>
       </div>
 
-      <div className="vf-hero-dots" role="tablist" aria-label="Кадры">
+      <div
+        className="absolute bottom-[22px] left-1/2 -translate-x-1/2 z-10 flex items-center gap-[22px]"
+        role="tablist"
+        aria-label="Кадры"
+      >
         {Array.from({ length: slideCount }, (_, i) => (
           <button
             key={i}

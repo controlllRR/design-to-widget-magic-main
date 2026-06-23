@@ -7,22 +7,22 @@ import { GenerationPreloaderOverlay } from "@/components/widget/screens/generati
 import type { ReactNode } from "react";
 
 export function GenerationHero({
-  height,
+  height = 516,
   overlay,
   src = GENERATION_HERO.generation,
   wearRails,
   ...wearProps
 }: {
-  height?: number | string;
+  height?: number;
   overlay?: ReactNode;
   src?: string;
   wearRails?: boolean;
 } & GenerationHeroOverlayProps) {
   return (
     <div
-      className="relative mx-3 overflow-hidden shrink-0 min-w-0"
+      className="relative mx-3 overflow-hidden shrink-0"
       style={{
-        height: height ?? "var(--vf-h-hero)",
+        height,
         backgroundColor: "var(--vf-card-hero)",
       }}
     >
@@ -40,10 +40,10 @@ export function GenerationHero({
 
 /** @deprecated Use `GenerationHero` + `GenerationPreloaderOverlay`. */
 export function GenerationHeroSkeleton({
-  height,
+  height = 516,
   label = "примерка",
 }: {
-  height?: number | string;
+  height?: number;
   label?: string;
 }) {
   return (
