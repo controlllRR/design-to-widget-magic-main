@@ -374,6 +374,7 @@ export interface I18nDictionary {
     photoModeModel: string;
     lookTab: string;
     addLook: string;
+    deleteLook: string;
     photoSlots: Record<ProfilePhotoSlotId, string>;
     photoRequired: string;
     removeAdditionalPhotos: string;

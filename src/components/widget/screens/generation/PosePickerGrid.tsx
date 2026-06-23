@@ -111,23 +111,19 @@ export function ProfileAvatarPicker({
             onClick={() => onSelect(i)}
             aria-pressed={isSelected}
             aria-label={isPhoto ? `Профиль ${i + 1}` : "Добавить профиль"}
-            className="shrink-0 relative flex items-center justify-center"
+            className="shrink-0 relative flex items-center justify-center rounded-full"
             style={{
               width: 50,
               height: 50,
-              overflow: i === 0 && isSelected ? "visible" : "hidden",
+              overflow: "hidden",
               opacity: isPhoto && !isSelected && i !== 1 ? 0.55 : 1,
             }}
           >
             <img
               src={item.src}
               alt=""
-              width={50}
-              height={50}
-              className="block max-w-none"
+              className="block w-full h-full rounded-full"
               style={{
-                width: 50,
-                height: 50,
                 objectFit: "cover",
                 objectPosition: "center",
               }}

@@ -67,7 +67,13 @@ export function ConfiguringGeneration({
           <ConfiguringHeroPreview />
         </div>
 
-        <section style={{ paddingInline: "var(--vf-sp-12)", paddingTop: "var(--vf-sp-24)" }}>
+        <section
+          style={{
+            paddingInline: "var(--vf-sp-12)",
+            paddingTop: "var(--vf-sp-24)",
+            paddingBottom: "var(--vf-sp-20)",
+          }}
+        >
           <h2 className="mb-3" style={sectionHeadingStyle}>
             {cfg.selectProfile}
           </h2>

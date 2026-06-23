@@ -106,6 +106,7 @@ export const defaultWidgetConfig: WidgetConfig = {
         photoModeModel: "использовать модель",
         lookTab: "Образ",
         addLook: "Добавить образ",
+        deleteLook: "Удалить образ",
         photoSlots: {
           portrait: "портрет: анфас",
           fullHeight: "в полный рост",
@@ -707,6 +708,7 @@ export const defaultWidgetConfig: WidgetConfig = {
         photoModeModel: "use model",
         lookTab: "Look",
         addLook: "Add look",
+        deleteLook: "Delete look",
         photoSlots: {
           portrait: "portrait: front",
           fullHeight: "full height",

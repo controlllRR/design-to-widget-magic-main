@@ -1,4 +1,4 @@
-import { Plus, UserCircle2 } from "lucide-react";
+import { Plus, Trash2, UserCircle2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import type {
@@ -159,6 +159,14 @@ export function CreateProfile({
   // Looks (вкладки «Образ 1 / +»)
   const [looks, setLooks] = useState<number[]>([1]);
   const [activeLook, setActiveLook] = useState(1);
+
+  const deleteActiveLook = () => {
+    if (looks.length <= 1) return;
+    const idx = looks.indexOf(activeLook);
+    const nextLooks = looks.filter((n) => n !== activeLook);
+    setLooks(nextLooks);
+    setActiveLook(nextLooks[Math.max(0, idx - 1)] ?? nextLooks[0]);
+  };
 
   // Параметры
   const [paramsTab, setParamsTab] = useState<ProfileParamsTab>(
@@ -510,18 +518,38 @@ export function CreateProfile({
             {/* Looks tabs */}
             <Section>
               <div
-                className="flex items-center w-full min-w-0"
-                style={{ gap: "var(--vf-sp-16)" }}
+                className="flex items-end w-full min-w-0"
+                style={{ gap: "var(--vf-sp-12)" }}
               >
-                <SegmentedTabs
-                  variant="underline"
-                  value={String(activeLook)}
-                  onChange={(v) => setActiveLook(Number(v))}
-                  items={looks.map((n) => ({
-                    id: String(n),
-                    label: `${t_cp.lookTab} ${n}`,
-                  }))}
-                />
+                <div className="flex-1 min-w-0">
+                  <SegmentedTabs
+                    variant="underline"
+                    value={String(activeLook)}
+                    onChange={(v) => setActiveLook(Number(v))}
+                    items={looks.map((n) => ({
+                      id: String(n),
+                      label: `${t_cp.lookTab} ${n}`,
+                    }))}
+                  />
+                </div>
+                {looks.length > 1 ? (
+                  <button
+                    type="button"
+                    aria-label={t_cp.deleteLook}
+                    onClick={deleteActiveLook}
+                    className="flex items-center justify-center shrink-0"
+                    style={{
+                      width: 28,
+                      height: 28,
+                      marginBottom: "var(--vf-sp-6)",
+                    }}
+                  >
+                    <Trash2
+                      strokeWidth={1.5}
+                      style={{ width: 16, height: 16, color: "var(--vf-text)" }}
+                    />
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   aria-label={t_cp.addLook}
@@ -531,7 +559,11 @@ export function CreateProfile({
                     setActiveLook(next);
                   }}
                   className="flex items-center justify-center shrink-0"
-                  style={{ width: 28, height: 28 }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    marginBottom: "var(--vf-sp-6)",
+                  }}
                 >
                   <Plus
                     strokeWidth={1.5}
