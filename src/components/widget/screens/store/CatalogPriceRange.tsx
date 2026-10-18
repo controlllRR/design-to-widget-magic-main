@@ -166,7 +166,7 @@ export function CatalogPriceRange({
 
       <div
         ref={trackRef}
-        className="relative touch-none select-none"
+        className={`relative touch-none select-none${dragging ? " vf-slider--dragging" : ""}`}
         style={{ height: 24, cursor: dragging ? "grabbing" : "pointer" }}
         onPointerDown={onTrackPointerDown}
         onPointerMove={onTrackPointerMove}

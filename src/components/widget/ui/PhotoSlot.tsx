@@ -148,7 +148,7 @@ export function PhotoSlot({
             fontFamily: "var(--vf-font-body)",
             fontSize: "var(--vf-fs-12)",
             fontWeight: 500,
-            color: "var(--vf-text)",
+            color: invalid ? "var(--vf-error, #e63946)" : "var(--vf-text)",
           }}
         >
           {label}

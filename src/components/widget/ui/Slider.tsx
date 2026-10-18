@@ -1,4 +1,4 @@
-import { useId, type ChangeEvent } from "react";
+import { useId, useState, type ChangeEvent, type PointerEvent } from "react";
 
 interface SliderProps {
   value: number;
@@ -17,7 +17,7 @@ interface SliderProps {
  * Тонкий слайдер по дизайну Figma:
  *  - линия 1px, заполненная часть — текущим текстовым цветом;
  *  - круглый ползунок 16px (var(--vf-text)) с лёгкой тенью.
- * Все размеры и цвета — fluid/токенные. Ничего не хардкодится.
+ * При drag — мгновенно за пальцем; плавный transition только без зажатия.
  */
 export function Slider({
   value,
@@ -30,6 +30,7 @@ export function Slider({
   accent,
 }: SliderProps) {
   const id = useId();
+  const [dragging, setDragging] = useState(false);
   const pct = empty
     ? 0
     : Math.min(
@@ -38,8 +39,18 @@ export function Slider({
       );
   const color = accent ?? "var(--vf-text)";
 
+  const endDrag = (e: PointerEvent<HTMLInputElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    setDragging(false);
+  };
+
   return (
-    <div className="relative w-full min-w-0" style={{ height: "var(--vf-sz-22)" }}>
+    <div
+      className={`relative w-full min-w-0${dragging ? " vf-slider--dragging" : ""}`}
+      style={{ height: "var(--vf-sz-22)" }}
+    >
       <div
         aria-hidden
         className="absolute left-0 right-0 rounded-full"
@@ -85,6 +96,12 @@ export function Slider({
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
           onChange(Number(e.target.value))
         }
+        onPointerDown={(e) => {
+          setDragging(true);
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
         className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
       />
     </div>

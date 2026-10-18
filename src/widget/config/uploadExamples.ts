@@ -35,6 +35,34 @@ import maleFullBad1 from "@/assets/upload-examples/male/full-height/bad-1.png";
 import maleFullBad2 from "@/assets/upload-examples/male/full-height/bad-2.png";
 import maleFullBad3 from "@/assets/upload-examples/male/full-height/bad-3.png";
 
+import femaleBackGood1 from "@/assets/upload-examples/female/back/good-1.png";
+import femaleBackGood2 from "@/assets/upload-examples/female/back/good-2.png";
+import femaleBackGood3 from "@/assets/upload-examples/female/back/good-3.png";
+import femaleBackBad1 from "@/assets/upload-examples/female/back/bad-1.png";
+import femaleBackBad2 from "@/assets/upload-examples/female/back/bad-2.png";
+import femaleBackBad3 from "@/assets/upload-examples/female/back/bad-3.png";
+
+import maleBackGood1 from "@/assets/upload-examples/male/back/good-1.png";
+import maleBackGood2 from "@/assets/upload-examples/male/back/good-2.png";
+import maleBackGood3 from "@/assets/upload-examples/male/back/good-3.png";
+import maleBackBad1 from "@/assets/upload-examples/male/back/bad-1.png";
+import maleBackBad2 from "@/assets/upload-examples/male/back/bad-2.png";
+import maleBackBad3 from "@/assets/upload-examples/male/back/bad-3.png";
+
+import femaleProfileGood1 from "@/assets/upload-examples/female/profile/good-1.png";
+import femaleProfileGood2 from "@/assets/upload-examples/female/profile/good-2.png";
+import femaleProfileGood3 from "@/assets/upload-examples/female/profile/good-3.png";
+import femaleProfileBad1 from "@/assets/upload-examples/female/profile/bad-1.png";
+import femaleProfileBad2 from "@/assets/upload-examples/female/profile/bad-2.png";
+import femaleProfileBad3 from "@/assets/upload-examples/female/profile/bad-3.jpg";
+
+import maleProfileGood1 from "@/assets/upload-examples/male/profile/good-1.png";
+import maleProfileGood2 from "@/assets/upload-examples/male/profile/good-2.jpg";
+import maleProfileGood3 from "@/assets/upload-examples/male/profile/good-3.jpg";
+import maleProfileBad1 from "@/assets/upload-examples/male/profile/bad-1.png";
+import maleProfileBad2 from "@/assets/upload-examples/male/profile/bad-2.png";
+import maleProfileBad3 from "@/assets/upload-examples/male/profile/bad-3.png";
+
 export type UploadExampleGender = "female" | "male";
 
 export interface UploadExamplesForSlot {
@@ -49,8 +77,6 @@ export type UploadExamplesByGender = Record<
   Record<ProfilePhotoSlotId, UploadExamplesForSlot>
 >;
 
-const empty: UploadExamplesForSlot = { good: [], bad: [] };
-
 export const defaultUploadExamples: UploadExamplesByGender = {
   female: {
     portrait: {
@@ -62,8 +88,14 @@ export const defaultUploadExamples: UploadExamplesByGender = {
       good: [femaleFullGood3, femaleFullGood1, femaleFullGood2],
       bad: [femaleFullBad1, femaleFullBad2, femaleFullBad3],
     },
-    back: empty,
-    profile: empty,
+    back: {
+      good: [femaleBackGood1, femaleBackGood2, femaleBackGood3],
+      bad: [femaleBackBad1, femaleBackBad2, femaleBackBad3],
+    },
+    profile: {
+      good: [femaleProfileGood1, femaleProfileGood2, femaleProfileGood3],
+      bad: [femaleProfileBad1, femaleProfileBad2, femaleProfileBad3],
+    },
   },
   male: {
     portrait: {
@@ -75,7 +107,13 @@ export const defaultUploadExamples: UploadExamplesByGender = {
       good: [maleFullGood3, maleFullGood1, maleFullGood2],
       bad: [maleFullBad1, maleFullBad2, maleFullBad3],
     },
-    back: empty,
-    profile: empty,
+    back: {
+      good: [maleBackGood1, maleBackGood2, maleBackGood3],
+      bad: [maleBackBad1, maleBackBad2, maleBackBad3],
+    },
+    profile: {
+      good: [maleProfileGood1, maleProfileGood2, maleProfileGood3],
+      bad: [maleProfileBad1, maleProfileBad2, maleProfileBad3],
+    },
   },
 };

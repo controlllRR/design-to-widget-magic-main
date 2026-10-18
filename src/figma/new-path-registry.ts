@@ -4,7 +4,7 @@
  */
 export const FIGMA_NEW_PATH = {
   pageId: "59:2578",
-  fileKeyBridge: "unsaved-mqp7tb86-bkc7xct9",
+  fileKeyBridge: "unsaved-mvd2hysn-rj9duxiy",
   fileKeyCloud: "nEJeT6wB7wu3XOya5ZMPPH",
   screens: {
     startPage: "674:3338",
@@ -19,6 +19,9 @@ export const FIGMA_NEW_PATH = {
     createProfileModelBoy: "717:3263",
     createProfileErrors: "1067:28034",
     uploadPhoto: "674:3723",
+    /** Figma: sheet «Как измерить рост» → ProfileHelpSheet, не InfoModal upload-tips. */
+    measureGuideHeight: "674:3415",
+    /** Upload tips — режим tips в PhotoUploadDialog (отдельного фрейма нет). */
     infoModal: "674:3415",
     configuringGeneration: "723:3176",
     preloaderV1: "1183:16399",

@@ -31,9 +31,12 @@ export function ChangeBackground({
 }: ChangeBackgroundProps) {
   const { t, config } = useWidgetConfig();
   const s = t.screens;
-  const catalogTiles = useResolvedConfigTiles(config.teleport.backgrounds);
+  const catalogTiles = useResolvedConfigTiles(config.teleport.backgrounds).map((tile) => ({
+    ...tile,
+    label: s.background.tiles[tile.id] ?? tile.label,
+  }));
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState("studio-cold");
+  const [selected, setSelected] = useState("studio-photo");
   const [uploadOpen, setUploadOpen] = useState(initialUploadOpen);
   const [customBg, setCustomBg] = useState<string | null>(null);
 

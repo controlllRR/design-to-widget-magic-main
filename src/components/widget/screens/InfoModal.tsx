@@ -19,7 +19,10 @@ export interface InfoModalProps {
   onClose?: () => void;
 }
 
-/** Information modal — Figma `674:3415` (bottom sheet как PhotoUploadDialog). */
+/**
+ * Upload tips / examples sheet (режим tips в PhotoUploadDialog).
+ * Figma `674:3415` — отдельный фрейм «Как измерить рост» → ProfileHelpSheet.
+ */
 export function InfoModal({
   open = true,
   slotId = "portrait",
@@ -46,6 +49,7 @@ export function InfoModal({
     profile: ud.profileTitle,
   };
   const title = titleBySlot[slotId];
+  const subtitle = ud.subtitleBySlot?.[slotId] ?? ud.subtitle;
   const tips = ud.tipsBySlot?.[slotId] ?? ud.tips;
 
   useEffect(() => {
@@ -120,7 +124,7 @@ export function InfoModal({
             marginBottom: "var(--vf-sp-16)",
           }}
         >
-          {ud.subtitle}
+          {subtitle}
         </p>
 
         {view === "examples" ? (
@@ -132,7 +136,7 @@ export function InfoModal({
         <button
           type="button"
           onClick={() => setView((v) => (v === "examples" ? "tips" : "examples"))}
-          className="self-start text-left underline underline-offset-2 transition-opacity hover:opacity-80"
+          className="self-start text-left underline decoration-dotted underline-offset-4 transition-opacity hover:opacity-80"
           style={{
             display: "inline-block",
             marginTop: "var(--vf-sp-16)",

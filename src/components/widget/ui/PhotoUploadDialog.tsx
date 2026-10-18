@@ -58,6 +58,7 @@ export function PhotoUploadDialog({
   };
   const title = titleBySlot[slotId];
   const displayTitle = slotId === "fullHeight" ? renderBalancedTitle(title) : title;
+  const subtitle = ud.subtitleBySlot?.[slotId] ?? ud.subtitle;
 
   const handleFile = (file: File | undefined) => {
     if (!file) return;
@@ -123,7 +124,7 @@ export function PhotoUploadDialog({
           marginBottom: "var(--vf-sp-16)",
         }}
       >
-        {ud.subtitle}
+        {subtitle}
       </p>
 
       {view === "examples" ? (
@@ -142,7 +143,7 @@ export function PhotoUploadDialog({
       <button
         type="button"
         onClick={() => setView((v) => (v === "examples" ? "tips" : "examples"))}
-        className="self-start text-left underline underline-offset-2"
+        className="self-start text-left underline decoration-dotted underline-offset-4"
         style={{
           display: "inline-block",
           marginTop: "var(--vf-sp-16)",

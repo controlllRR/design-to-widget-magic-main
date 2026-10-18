@@ -13,12 +13,18 @@ import {
   isMediaIdbRef,
   saveBackgroundTile,
   savePoseTile,
+  saveBrandLogo,
   saveSplashSlide,
   saveUploadExample,
 } from "@/widget/config/media-assets";
+import defaultLogoUrl from "@/assets/brand/default-logo.svg";
 import { useSplashSlidePreview } from "@/widget/config/useResolvedSplashImages";
 import { useTileImagePreview, useTileMediaPreview } from "@/widget/config/useResolvedTiles";
-import type { ConfigTile, ProfilePhotoSlotId } from "@/widget/config/types";
+import type {
+  ConfigTile,
+  LogoAnimationId,
+  ProfilePhotoSlotId,
+} from "@/widget/config/types";
 import { TileMedia } from "@/components/widget/ui/TileMedia";
 import {
   defaultUploadExamples,
@@ -28,10 +34,22 @@ import {
 } from "@/widget/config/uploadExamples";
 import { BrandLogo } from "@/components/widget/BrandLogo";
 import Widget from "@/components/widget/Widget";
+import { FONT_CATALOG, matchFontOption } from "@/widget/config/fontCatalog";
+import { AdminI18nEditor } from "@/routes/adminI18nEditor";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
+
+const LOGO_ANIMATION_OPTIONS: Array<{ id: LogoAnimationId; label: string }> = [
+  { id: "fadeIn", label: "Появление (fade)" },
+  { id: "slideDown", label: "Съезд сверху" },
+  { id: "scaleIn", label: "Масштаб" },
+  { id: "rotateIn", label: "Поворот" },
+  { id: "float", label: "Парение (цикл)" },
+  { id: "pulse", label: "Пульс (цикл)" },
+  { id: "shimmer", label: "Блик (цикл)" },
+];
 
 const COLOR_FIELDS: Array<{
   key: keyof WidgetColors;
@@ -490,6 +508,10 @@ function AdminPage() {
     useState<UploadExampleGender>("female");
   const [uploadExamplesSlot, setUploadExamplesSlot] =
     useState<ProfilePhotoSlotId>("portrait");
+  /** Перезапуск CSS-анимации логотипа в превью. */
+  const [logoPreviewKey, setLogoPreviewKey] = useState(0);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   const light = {
     ...defaultWidgetConfig.theme.light,
@@ -763,6 +785,35 @@ function AdminPage() {
     }
   };
 
+  const setBrandLogoUrl = async (nextUrl: string | undefined) => {
+    const prevUrl = overrides.brand?.logoUrl ?? defaultWidgetConfig.brand.logoUrl;
+    if (prevUrl && isMediaIdbRef(prevUrl) && prevUrl !== nextUrl) {
+      await deleteMediaRef(prevUrl);
+    }
+    patch((prev) => ({
+      ...prev,
+      brand: {
+        ...defaultWidgetConfig.brand,
+        ...prev.brand,
+        logoUrl: nextUrl,
+      },
+    }));
+    setLogoPreviewKey((k) => k + 1);
+  };
+
+  const onLogoFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const ref = await saveBrandLogo(file);
+      await setBrandLogoUrl(ref);
+    } finally {
+      setUploadingLogo(false);
+      e.target.value = "";
+    }
+  };
+
   const resetAll = async () => {
     for (const ref of splashImages) {
       await deleteSplashSlide(ref);
@@ -778,6 +829,9 @@ function AdminPage() {
       for (const ref of collectCustomUploadRefs(customExamples, defaultUploadExamples)) {
         await deleteMediaRef(ref);
       }
+    }
+    if (brand.logoUrl && isMediaIdbRef(brand.logoUrl)) {
+      await deleteMediaRef(brand.logoUrl);
     }
     resetOverrides();
   };
@@ -844,35 +898,53 @@ function AdminPage() {
             <section className="bg-white rounded-xl shadow p-5 space-y-4">
               <SectionIntro
                 title="Шрифты и скругления"
-                description="Типографика и форма элементов. Указывайте CSS font-family (как в макете)."
+                description="Типографика и форма элементов. Выберите шрифт из списка — справа сразу видно в превью."
               />
               <label className="block text-sm">
                 <span className="font-medium">Шрифт заголовков</span>
                 <FieldHint>Крупные заголовки, uppercase-надписи, названия разделов.</FieldHint>
-                <input
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                  value={fonts.heading}
-                  onChange={(e) =>
+                <select
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                  value={matchFontOption(fonts.heading).id}
+                  onChange={(e) => {
+                    const next = FONT_CATALOG.find((f) => f.id === e.target.value);
+                    if (!next) return;
                     patch((prev) => ({
                       ...prev,
-                      theme: { ...prev.theme, fonts: { ...fonts, heading: e.target.value } },
-                    }))
-                  }
-                />
+                      theme: { ...prev.theme, fonts: { ...fonts, heading: next.value } },
+                    }));
+                  }}
+                  style={{ fontFamily: fonts.heading }}
+                >
+                  {FONT_CATALOG.map((font) => (
+                    <option key={font.id} value={font.id} style={{ fontFamily: font.value }}>
+                      {font.label}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block text-sm">
                 <span className="font-medium">Шрифт основного текста</span>
                 <FieldHint>Описания, подписи полей, кнопки, вторичный контент.</FieldHint>
-                <input
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                  value={fonts.body}
-                  onChange={(e) =>
+                <select
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                  value={matchFontOption(fonts.body).id}
+                  onChange={(e) => {
+                    const next = FONT_CATALOG.find((f) => f.id === e.target.value);
+                    if (!next) return;
                     patch((prev) => ({
                       ...prev,
-                      theme: { ...prev.theme, fonts: { ...fonts, body: e.target.value } },
-                    }))
-                  }
-                />
+                      theme: { ...prev.theme, fonts: { ...fonts, body: next.value } },
+                    }));
+                  }}
+                  style={{ fontFamily: fonts.body }}
+                >
+                  {FONT_CATALOG.map((font) => (
+                    <option key={font.id} value={font.id} style={{ fontFamily: font.value }}>
+                      {font.label}
+                    </option>
+                  ))}
+                </select>
               </label>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {RADIUS_FIELDS.map(({ key, label, hint }) => (
@@ -918,41 +990,122 @@ function AdminPage() {
                   }
                 />
               </label>
-              <label className="block text-sm">
-                <span className="font-medium">URL логотипа (SVG / PNG)</span>
-                <FieldHint>Ссылка на файл логотипа. Пусто — показывается текст alt.</FieldHint>
+              <div className="space-y-2">
+                <span className="font-medium text-sm block">Логотип</span>
+                <FieldHint>
+                  Выберите SVG / PNG / JPG с компьютера. Файл сохраняется в браузере.
+                </FieldHint>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <button
+                    type="button"
+                    disabled={uploadingLogo}
+                    onClick={() => logoFileRef.current?.click()}
+                    className="text-xs px-3 py-1.5 rounded-full bg-neutral-900 text-white disabled:opacity-60"
+                  >
+                    {uploadingLogo ? "Загрузка…" : "Выбрать файл"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={uploadingLogo || !brand.logoUrl || brand.logoUrl === defaultLogoUrl}
+                    onClick={() => void setBrandLogoUrl(undefined)}
+                    className="text-xs px-3 py-1.5 rounded-full bg-white border border-neutral-300 disabled:opacity-60"
+                  >
+                    Сбросить к дефолту
+                  </button>
+                </div>
                 <input
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                  value={brand.logoUrl ?? ""}
-                  onChange={(e) =>
-                    patch((prev) => ({
-                      ...prev,
-                      brand: { ...brand, logoUrl: e.target.value || undefined },
-                    }))
-                  }
+                  ref={logoFileRef}
+                  type="file"
+                  accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={(e) => void onLogoFile(e)}
                 />
-              </label>
+                <label className="block text-sm pt-1">
+                  <span className="font-medium">Или URL</span>
+                  <FieldHint>Опционально — ссылка вместо файла.</FieldHint>
+                  <input
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                    value={
+                      brand.logoUrl && !isMediaIdbRef(brand.logoUrl) && brand.logoUrl !== defaultLogoUrl
+                        ? brand.logoUrl
+                        : ""
+                    }
+                    placeholder="https://…"
+                    onChange={(e) => {
+                      const next = e.target.value.trim();
+                      void setBrandLogoUrl(next || undefined);
+                    }}
+                  />
+                </label>
+              </div>
               <label className="flex items-start gap-2 text-sm">
                 <input
                   type="checkbox"
                   className="mt-1"
                   checked={brand.logoAnimationEnabled}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const enabled = e.target.checked;
                     patch((prev) => ({
                       ...prev,
-                      brand: { ...brand, logoAnimationEnabled: e.target.checked },
-                    }))
-                  }
+                      brand: { ...brand, logoAnimationEnabled: enabled },
+                    }));
+                    if (enabled) setLogoPreviewKey((k) => k + 1);
+                  }}
                 />
                 <span>
                   <span className="font-medium block">Анимация логотипа</span>
                   <FieldHint>Включить анимацию появления логотипа в шапке.</FieldHint>
                 </span>
               </label>
+              {brand.logoAnimationEnabled ? (
+                <label className="block text-sm">
+                  <span className="font-medium">Тип анимации</span>
+                  <FieldHint>
+                    Одноразовые — при появлении экрана; циклические — крутятся постоянно.
+                  </FieldHint>
+                  <select
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                    value={brand.logoAnimation}
+                    onChange={(e) => {
+                      const logoAnimation = e.target.value as LogoAnimationId;
+                      patch((prev) => ({
+                        ...prev,
+                        brand: { ...brand, logoAnimation },
+                      }));
+                      setLogoPreviewKey((k) => k + 1);
+                    }}
+                  >
+                    {LOGO_ANIMATION_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
               <div>
-                <p className="text-xs text-neutral-500 mb-2">Предпросмотр логотипа на тёмном фоне</p>
-                <div className="flex items-center gap-3 p-3 bg-neutral-900 rounded-lg">
-                  <BrandLogo animationOverride={brand.logoAnimation} enabledOverride />
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="text-xs text-neutral-500">
+                    Предпросмотр логотипа на тёмном фоне
+                  </p>
+                  {brand.logoAnimationEnabled ? (
+                    <button
+                      type="button"
+                      className="text-xs px-2.5 py-1 rounded-full border border-neutral-300 bg-white"
+                      onClick={() => setLogoPreviewKey((k) => k + 1)}
+                    >
+                      Повторить анимацию
+                    </button>
+                  ) : null}
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-neutral-900 rounded-lg min-h-[52px]">
+                  <BrandLogo
+                    key={logoPreviewKey}
+                    animationKey={logoPreviewKey}
+                    animationOverride={brand.logoAnimation}
+                    enabledOverride={brand.logoAnimationEnabled}
+                    disableLink
+                  />
                 </div>
               </div>
             </section>
@@ -1062,6 +1215,14 @@ function AdminPage() {
                   <span className="font-medium uppercase tracking-wide">{watermark.text}</span>
                 </p>
               </div>
+            </section>
+
+            <section className="bg-white rounded-xl shadow p-5 space-y-4">
+              <SectionIntro
+                title="Тексты и локализация"
+                description="Каждая надпись виджета — на русском и английском. Меняйте формулировки и переключайте язык превью."
+              />
+              <AdminI18nEditor overrides={overrides} patch={patch} />
             </section>
 
             <section className="bg-white rounded-xl shadow p-5 space-y-4">

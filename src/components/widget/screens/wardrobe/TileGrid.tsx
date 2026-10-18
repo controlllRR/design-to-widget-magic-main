@@ -118,7 +118,7 @@ export function SearchFilterBar({
         }}
       >
         <input
-          className="flex-1 min-w-0 bg-transparent outline-none text-xs uppercase text-[var(--vf-text)] placeholder:text-[var(--vf-text-muted)] placeholder:uppercase"
+          className="flex-1 min-w-0 bg-transparent outline-none text-xs lowercase text-[var(--vf-text)] placeholder:text-[var(--vf-text-muted)] placeholder:lowercase"
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}

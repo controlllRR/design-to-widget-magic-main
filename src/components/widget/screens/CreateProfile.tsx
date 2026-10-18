@@ -81,8 +81,8 @@ function filledProfilePhotos(gender: Gender): Partial<Record<ProfilePhotoSlotId,
   return {
     portrait: ex.portrait.good[0] ?? PLACEHOLDER_PHOTO,
     fullHeight: ex.fullHeight.good[0] ?? PLACEHOLDER_PHOTO,
-    back: ex.portrait.good[1] ?? PLACEHOLDER_PHOTO,
-    profile: ex.portrait.good[2] ?? PLACEHOLDER_PHOTO,
+    back: ex.back.good[0] ?? PLACEHOLDER_PHOTO,
+    profile: ex.profile.good[0] ?? PLACEHOLDER_PHOTO,
   };
 }
 
@@ -155,14 +155,18 @@ export function CreateProfile({
         return filledProfilePhotos(cp.genders[0] ?? "female");
       }
       if (variant === "errors") {
+        const ex = defaultUploadExamples[cp.genders[0] ?? "female"];
         return {
-          back: defaultUploadExamples[cp.genders[0] ?? "female"].portrait.good[1],
-          profile: defaultUploadExamples[cp.genders[0] ?? "female"].portrait.good[2],
+          back: ex.back.good[0],
+          profile: ex.profile.good[0],
         };
       }
       return {};
     },
   );
+
+  /** Доп. слоты (со спины / сбоку). Figma empty/filled: 4 слота + «Убрать дополнительные фото». */
+  const [showExtraPhotos, setShowExtraPhotos] = useState(true);
 
   // Looks (вкладки «Образ 1 / +»)
   const [looks, setLooks] = useState<number[]>([1]);
@@ -345,8 +349,25 @@ export function CreateProfile({
     });
   };
 
-  const photoSlots = cp.photoSlots.filter((s) => s.enabled);
+  const enabledPhotoSlots = cp.photoSlots.filter((s) => s.enabled);
+  const optionalPhotoIds = enabledPhotoSlots.filter((s) => !s.required).map((s) => s.id);
+  const photoSlots = showExtraPhotos
+    ? enabledPhotoSlots
+    : enabledPhotoSlots.filter((s) => s.required);
   const fields = cp.paramsFields[paramsTab];
+
+  const toggleExtraPhotos = () => {
+    if (showExtraPhotos) {
+      setPhotos((prev) => {
+        const next = { ...prev };
+        for (const id of optionalPhotoIds) delete next[id];
+        return next;
+      });
+      setShowExtraPhotos(false);
+    } else {
+      setShowExtraPhotos(true);
+    }
+  };
 
   return (
     <div
@@ -662,19 +683,22 @@ export function CreateProfile({
                   />
                 ))}
               </div>
-              <button
-                type="button"
-                className="self-start text-left underline underline-offset-2"
-                style={{
-                  marginTop: "var(--vf-sp-12)",
-                  fontFamily: "var(--vf-font-body)",
-                  fontSize: "var(--vf-fs-12)",
-                  fontWeight: 500,
-                  color: "color-mix(in oklab, var(--vf-text) 70%, transparent)",
-                }}
-              >
-                {t_cp.removeAdditionalPhotos}
-              </button>
+              {optionalPhotoIds.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={toggleExtraPhotos}
+                  className="self-start text-left underline underline-offset-2"
+                  style={{
+                    marginTop: "var(--vf-sp-12)",
+                    fontFamily: "var(--vf-font-body)",
+                    fontSize: "var(--vf-fs-12)",
+                    fontWeight: 500,
+                    color: "color-mix(in oklab, var(--vf-text) 70%, transparent)",
+                  }}
+                >
+                  {showExtraPhotos ? t_cp.removeAdditionalPhotos : t_cp.addAdditionalPhotos}
+                </button>
+              ) : null}
             </Section>
           </>
         )}
@@ -1093,7 +1117,7 @@ export function CreateProfile({
             }}
           >
             {variant === "errors" && photoMode === "own" && !photosOk
-              ? "для создания профиля с вашей фотографией нужно загрузить обязательные снимки."
+              ? t_cp.errorPhotos
               : photoMode === "own" && !photosOk
                 ? t_cp.errorPhotos
                 : photoMode === "model" && !photosOk
@@ -1128,9 +1152,9 @@ export function CreateProfile({
 
       <WarningModal
         open={showDeleteConfirm}
-        title={t_cp.deleteProfileDialog?.title ?? "Вы действительно хотите удалить профиль?"}
-        confirmLabel={t_cp.deleteProfileDialog?.confirm ?? "да, удалить"}
-        cancelLabel={t_cp.deleteProfileDialog?.cancel ?? "отмена"}
+        title={t_cp.deleteProfileDialog.title}
+        confirmLabel={t_cp.deleteProfileDialog.confirm}
+        cancelLabel={t_cp.deleteProfileDialog.cancel}
         onCancel={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
           setShowDeleteConfirm(false);

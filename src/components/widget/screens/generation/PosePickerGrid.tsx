@@ -27,10 +27,12 @@ const EDIT_BADGE = {
 
 function PoseThumb({
   id,
+  label,
   selected,
   onToggle,
 }: {
   id: PoseId;
+  label: string;
   selected: boolean;
   onToggle: () => void;
 }) {
@@ -39,7 +41,7 @@ function PoseThumb({
       type="button"
       onClick={onToggle}
       aria-pressed={selected}
-      aria-label={POSE_LABELS[id]}
+      aria-label={label}
       className="shrink-0 overflow-hidden flex items-center justify-center"
       style={{
         width: 67,
@@ -66,9 +68,11 @@ export function PosePickerGrid({
   onToggle: (id: PoseId) => void;
 }) {
   const { t } = useWidgetConfig();
+  const poseLabels = t.screens.generation.poseLabels;
+  const labelOf = (id: PoseId) => poseLabels[id] ?? POSE_LABELS[id] ?? id;
   const selectedLabels = [...POSE_ROW_1, ...POSE_ROW_2]
     .filter((id) => selected.has(id))
-    .map((id) => POSE_LABELS[id]);
+    .map((id) => labelOf(id));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -77,6 +81,7 @@ export function PosePickerGrid({
           <PoseThumb
             key={id}
             id={id}
+            label={labelOf(id)}
             selected={selected.has(id)}
             onToggle={() => onToggle(id)}
           />
@@ -87,6 +92,7 @@ export function PosePickerGrid({
           <PoseThumb
             key={id}
             id={id}
+            label={labelOf(id)}
             selected={selected.has(id)}
             onToggle={() => onToggle(id)}
           />

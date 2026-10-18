@@ -3,13 +3,14 @@
  * Ссылки в overrides: `vf-idb://{kind}/{id}`.
  */
 const DB_NAME = "vf-widget";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 const STORES = {
   splash: "splash-slides",
   background: "background-tiles",
   pose: "pose-tiles",
   uploadExample: "upload-examples",
+  logo: "brand-logo",
 } as const;
 
 export type MediaStoreKind = keyof typeof STORES;
@@ -19,6 +20,7 @@ export const MEDIA_IDB_PREFIX = {
   background: "vf-idb://background/",
   pose: "vf-idb://pose/",
   uploadExample: "vf-idb://upload-example/",
+  logo: "vf-idb://logo/",
 } as const;
 
 export type MediaIdbPrefix = (typeof MEDIA_IDB_PREFIX)[MediaStoreKind];
@@ -164,4 +166,8 @@ export async function savePoseTile(file: File): Promise<string> {
 
 export async function saveUploadExample(file: File): Promise<string> {
   return saveMediaFile("uploadExample", file);
+}
+
+export async function saveBrandLogo(file: File): Promise<string> {
+  return saveMediaFile("logo", file);
 }

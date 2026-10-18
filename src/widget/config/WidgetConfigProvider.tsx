@@ -21,7 +21,7 @@ import type {
  * Глубокий merge partial-конфига с дефолтами (для встраивания на сайт-хост).
  * Массивы заменяются целиком (например, splash.images).
  */
-function deepMerge<T>(base: T, partial?: DeepPartial<T>): T {
+export function deepMerge<T>(base: T, partial?: DeepPartial<T>): T {
   if (!partial) return base;
   if (Array.isArray(base)) {
     return (Array.isArray(partial) ? partial : base) as T;

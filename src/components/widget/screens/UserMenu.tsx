@@ -190,7 +190,7 @@ function LegalRow({ href, label }: { href?: string; label: string }) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="lowercase transition-opacity hover:opacity-90 truncate"
+        className="transition-opacity hover:opacity-90 truncate"
         style={style}
       >
         {label}
@@ -199,7 +199,7 @@ function LegalRow({ href, label }: { href?: string; label: string }) {
   }
 
   return (
-    <p className="lowercase truncate" style={style}>
+    <p className="truncate" style={style}>
       {label}
     </p>
   );

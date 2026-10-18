@@ -27,7 +27,10 @@ export function AnimateImage({
 }: AnimateImageProps) {
   const { t, config } = useWidgetConfig();
   const s = t.screens;
-  const tiles = useResolvedConfigTiles(config.animateLook.poses);
+  const tiles = useResolvedConfigTiles(config.animateLook.poses).map((tile) => ({
+    ...tile,
+    label: s.animate.tiles[tile.id] ?? tile.label,
+  }));
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("pose-v1");
 

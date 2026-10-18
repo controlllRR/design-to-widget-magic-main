@@ -1,7 +1,8 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import defaultLogoUrl from "@/assets/brand/default-logo.svg";
 import type { LogoAnimationId } from "@/widget/config";
+import { isMediaIdbRef, resolveMediaRef } from "@/widget/config/media-assets";
 
 interface BrandLogoProps {
   /** Переопределить тип анимации (для предпросмотра в админке). */
@@ -23,6 +24,9 @@ interface BrandLogoProps {
  * Логотип сайта-хоста с поддержкой png / jpg / svg и опциональной анимацией.
  * Все параметры берутся из useWidgetConfig().brand, при необходимости
  * переопределяются для предпросмотра в админке.
+ *
+ * Важно: анимация «shimmer» использует ::after — его нельзя вешать на <img>
+ * (replaced element), поэтому аним-класс всегда на обёртке.
  */
 export function BrandLogo({
   animationOverride,
@@ -36,7 +40,37 @@ export function BrandLogo({
   const { config } = useWidgetConfig();
   const { brand } = config;
 
-  const url = brand.logoUrl ?? defaultLogoUrl;
+  const rawUrl = brand.logoUrl ?? defaultLogoUrl;
+  const [resolvedUrl, setResolvedUrl] = useState(() =>
+    isMediaIdbRef(rawUrl) ? "" : rawUrl,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl: string | undefined;
+
+    async function load() {
+      if (!isMediaIdbRef(rawUrl)) {
+        setResolvedUrl(rawUrl);
+        return;
+      }
+      const url = await resolveMediaRef(rawUrl);
+      if (cancelled) {
+        if (url.startsWith("blob:")) URL.revokeObjectURL(url);
+        return;
+      }
+      objectUrl = url.startsWith("blob:") ? url : undefined;
+      setResolvedUrl(url || defaultLogoUrl);
+    }
+
+    void load();
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [rawUrl]);
+
   const enabled = enabledOverride ?? brand.logoAnimationEnabled;
   const animation: LogoAnimationId = animationOverride ?? brand.logoAnimation;
   const invert = invertOverride ?? brand.logoInvert;
@@ -47,22 +81,21 @@ export function BrandLogo({
     height,
     width: "auto",
     objectFit: "contain",
+    display: "block",
     filter: invert ? "brightness(0) invert(1)" : undefined,
   };
 
-  const inner = url ? (
+  const media: ReactNode = resolvedUrl ? (
     <img
-      key={animationKey}
-      src={url}
+      src={resolvedUrl}
       alt={brand.logoAlt}
-      className={`vf-logo block ${animClass} ${className ?? ""}`.trim()}
+      className="block max-h-full w-auto"
       style={imgStyle}
       draggable={false}
     />
   ) : (
     <span
-      key={animationKey}
-      className={`vf-logo uppercase truncate ${animClass} ${className ?? ""}`.trim()}
+      className="uppercase truncate"
       style={{
         fontSize: "var(--vf-fs-12)",
         color: "var(--vf-on-primary)",
@@ -72,6 +105,16 @@ export function BrandLogo({
       }}
     >
       {brand.logoAlt}
+    </span>
+  );
+
+  const inner = (
+    <span
+      key={animationKey}
+      className={`vf-logo inline-flex items-center max-w-full ${animClass} ${className ?? ""}`.trim()}
+      style={{ height }}
+    >
+      {media}
     </span>
   );
 

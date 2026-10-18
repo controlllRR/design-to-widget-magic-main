@@ -378,6 +378,7 @@ export interface I18nDictionary {
     photoSlots: Record<ProfilePhotoSlotId, string>;
     photoRequired: string;
     removeAdditionalPhotos: string;
+    addAdditionalPhotos: string;
     paramsTitle: string;
     paramsTabBasic: string;
     paramsTabExtended: string;
@@ -450,7 +451,10 @@ export interface I18nDictionary {
       fullHeightTitle: string;
       backTitle: string;
       profileTitle: string;
+      /** Fallback-подзаголовок (если нет subtitleBySlot для слота). */
       subtitle: string;
+      /** Подзаголовок диалога по слоту фото. */
+      subtitleBySlot?: Partial<Record<ProfilePhotoSlotId, string>>;
       showTips: string;
       hideTips: string;
       cameraBtn: string;
@@ -645,11 +649,15 @@ export interface I18nDictionary {
       title: string;
       search: string;
       addCustom: string;
+      /** Подписи плиток телепорта по id. */
+      tiles: Record<string, string>;
     };
     animate: {
       title: string;
       search: string;
       addCustom: string;
+      /** Подписи поз / анимаций по id. */
+      tiles: Record<string, string>;
     };
     generation: {
       tryOn: string;
@@ -662,6 +670,8 @@ export interface I18nDictionary {
       configureOutfit: string;
       clearOutfit: string;
       moreActions: string;
+      /** Подписи ракурсов камеры на экране генерации. */
+      poseLabels: Record<string, string>;
       moreMenu: {
         title: string;
         fullScreen: string;

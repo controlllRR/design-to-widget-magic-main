@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 
 import appCss from "../styles.css?url";
 import { useAutoHideScrollbars } from "../lib/useAutoHideScrollbars";
+import { googleFontsCatalogHref } from "../widget/config/fontCatalog";
 
 function NotFoundComponent() {
   return (
@@ -48,7 +49,7 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;700;800&family=TikTok+Sans:opsz,wdth,wght@12..36,75..125,300..900&display=swap",
+        href: googleFontsCatalogHref(),
       },
     ],
   }),
