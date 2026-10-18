@@ -64,6 +64,8 @@ interface CreateProfileProps {
   onDeleteProfile?: () => void;
   /** Gallery QA: проскроллить к параметрам — Figma `1211:25283`. */
   initialScrollToParams?: boolean;
+  /** Gallery QA: открыть sheet замера — Figma `674:3415`. */
+  initialHelpSheet?: ProfileHelpSheetKind | null;
   /** При добавлении профиля с экрана конфигурации — сразу режим «модель». */
   initialPhotoMode?: "own" | "model";
   /** Предвыбранная модель при редактировании профиля. */
@@ -128,6 +130,7 @@ export function CreateProfile({
   onContinue,
   onDeleteProfile,
   initialScrollToParams = false,
+  initialHelpSheet = null,
   initialPhotoMode,
   initialModelId,
 }: CreateProfileProps) {
@@ -235,7 +238,9 @@ export function CreateProfile({
   );
   const [submitted, setSubmitted] = useState(variant === "errors");
   const [uploadSlot, setUploadSlot] = useState<ProfilePhotoSlotId | null>(null);
-  const [helpSheet, setHelpSheet] = useState<ProfileHelpSheetKind | null>(null);
+  const [helpSheet, setHelpSheet] = useState<ProfileHelpSheetKind | null>(
+    initialHelpSheet,
+  );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const paramsSectionRef = useRef<HTMLDivElement | null>(null);
 

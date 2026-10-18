@@ -11,7 +11,7 @@ interface BrandLogoProps {
   enabledOverride?: boolean;
   /** Сделать логотип некликабельным (для предпросмотра). */
   disableLink?: boolean;
-  /** Высота логотипа в стиле (по умолчанию var(--vf-sz-22)). */
+  /** Высота логотипа (px или CSS). Вне [data-vf-root] var(--vf-sz-22) недоступен. */
   height?: string;
   /** Принудительно отключить инверсию в белый. */
   invertOverride?: boolean;
@@ -32,7 +32,7 @@ export function BrandLogo({
   animationOverride,
   enabledOverride,
   disableLink,
-  height = "var(--vf-sz-22)",
+  height = "22px",
   invertOverride,
   animationKey,
   className,
@@ -40,14 +40,16 @@ export function BrandLogo({
   const { config } = useWidgetConfig();
   const { brand } = config;
 
-  const rawUrl = brand.logoUrl ?? defaultLogoUrl;
+  const rawUrl = brand.logoUrl || defaultLogoUrl;
   const [resolvedUrl, setResolvedUrl] = useState(() =>
     isMediaIdbRef(rawUrl) ? "" : rawUrl,
   );
+  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     let objectUrl: string | undefined;
+    setImgFailed(false);
 
     async function load() {
       if (!isMediaIdbRef(rawUrl)) {
@@ -80,26 +82,19 @@ export function BrandLogo({
   const imgStyle: CSSProperties = {
     height,
     width: "auto",
+    maxHeight: height,
     objectFit: "contain",
     display: "block",
     filter: invert ? "brightness(0) invert(1)" : undefined,
   };
 
-  const media: ReactNode = resolvedUrl ? (
-    <img
-      src={resolvedUrl}
-      alt={brand.logoAlt}
-      className="block max-h-full w-auto"
-      style={imgStyle}
-      draggable={false}
-    />
-  ) : (
+  const altFallback = (
     <span
       className="uppercase truncate"
       style={{
-        fontSize: "var(--vf-fs-12)",
-        color: "var(--vf-on-primary)",
-        fontFamily: "var(--vf-font-heading)",
+        fontSize: 12,
+        color: invert ? "#ffffff" : "#111111",
+        fontFamily: "var(--vf-font-heading, 'Manrope', sans-serif)",
         fontWeight: 600,
         letterSpacing: "0.4em",
       }}
@@ -107,6 +102,20 @@ export function BrandLogo({
       {brand.logoAlt}
     </span>
   );
+
+  const media: ReactNode =
+    resolvedUrl && !imgFailed ? (
+      <img
+        src={resolvedUrl}
+        alt={brand.logoAlt}
+        className="block max-h-full w-auto"
+        style={imgStyle}
+        draggable={false}
+        onError={() => setImgFailed(true)}
+      />
+    ) : (
+      altFallback
+    );
 
   const inner = (
     <span

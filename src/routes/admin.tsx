@@ -790,15 +790,23 @@ function AdminPage() {
     if (prevUrl && isMediaIdbRef(prevUrl) && prevUrl !== nextUrl) {
       await deleteMediaRef(prevUrl);
     }
+    patch((prev) => {
+      const nextBrand = { ...prev.brand };
+      if (!nextUrl) {
+        delete nextBrand.logoUrl;
+      } else {
+        nextBrand.logoUrl = nextUrl;
+      }
+      return { ...prev, brand: nextBrand };
+    });
+    setLogoPreviewKey((k) => k + 1);
+  };
+
+  const patchBrand = (partial: Partial<typeof defaultWidgetConfig.brand>) => {
     patch((prev) => ({
       ...prev,
-      brand: {
-        ...defaultWidgetConfig.brand,
-        ...prev.brand,
-        logoUrl: nextUrl,
-      },
+      brand: { ...prev.brand, ...partial },
     }));
-    setLogoPreviewKey((k) => k + 1);
   };
 
   const onLogoFile = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -982,12 +990,7 @@ function AdminPage() {
                 <input
                   className="mt-1 w-full border rounded px-3 py-2 text-sm"
                   value={brand.logoAlt}
-                  onChange={(e) =>
-                    patch((prev) => ({
-                      ...prev,
-                      brand: { ...brand, logoAlt: e.target.value },
-                    }))
-                  }
+                  onChange={(e) => patchBrand({ logoAlt: e.target.value })}
                 />
               </label>
               <div className="space-y-2">
@@ -1006,7 +1009,11 @@ function AdminPage() {
                   </button>
                   <button
                     type="button"
-                    disabled={uploadingLogo || !brand.logoUrl || brand.logoUrl === defaultLogoUrl}
+                    disabled={
+                      uploadingLogo ||
+                      !overrides.brand?.logoUrl ||
+                      overrides.brand.logoUrl === defaultLogoUrl
+                    }
                     onClick={() => void setBrandLogoUrl(undefined)}
                     className="text-xs px-3 py-1.5 rounded-full bg-white border border-neutral-300 disabled:opacity-60"
                   >
@@ -1026,7 +1033,9 @@ function AdminPage() {
                   <input
                     className="mt-1 w-full border rounded px-3 py-2 text-sm"
                     value={
-                      brand.logoUrl && !isMediaIdbRef(brand.logoUrl) && brand.logoUrl !== defaultLogoUrl
+                      brand.logoUrl &&
+                      !isMediaIdbRef(brand.logoUrl) &&
+                      brand.logoUrl !== defaultLogoUrl
                         ? brand.logoUrl
                         : ""
                     }
@@ -1045,10 +1054,7 @@ function AdminPage() {
                   checked={brand.logoAnimationEnabled}
                   onChange={(e) => {
                     const enabled = e.target.checked;
-                    patch((prev) => ({
-                      ...prev,
-                      brand: { ...brand, logoAnimationEnabled: enabled },
-                    }));
+                    patchBrand({ logoAnimationEnabled: enabled });
                     if (enabled) setLogoPreviewKey((k) => k + 1);
                   }}
                 />
@@ -1068,10 +1074,7 @@ function AdminPage() {
                     value={brand.logoAnimation}
                     onChange={(e) => {
                       const logoAnimation = e.target.value as LogoAnimationId;
-                      patch((prev) => ({
-                        ...prev,
-                        brand: { ...brand, logoAnimation },
-                      }));
+                      patchBrand({ logoAnimation });
                       setLogoPreviewKey((k) => k + 1);
                     }}
                   >
@@ -1083,6 +1086,20 @@ function AdminPage() {
                   </select>
                 </label>
               ) : null}
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={brand.logoInvert}
+                  onChange={(e) => patchBrand({ logoInvert: e.target.checked })}
+                />
+                <span>
+                  <span className="font-medium block">Белый логотип</span>
+                  <FieldHint>
+                    Инверсия в белый для тёмного фона шапки и splash (как в превью ниже).
+                  </FieldHint>
+                </span>
+              </label>
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-xs text-neutral-500">
@@ -1098,12 +1115,14 @@ function AdminPage() {
                     </button>
                   ) : null}
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-neutral-900 rounded-lg min-h-[52px]">
+                <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-lg min-h-[56px] overflow-visible">
                   <BrandLogo
                     key={logoPreviewKey}
                     animationKey={logoPreviewKey}
                     animationOverride={brand.logoAnimation}
                     enabledOverride={brand.logoAnimationEnabled}
+                    invertOverride={brand.logoInvert}
+                    height="28px"
                     disableLink
                   />
                 </div>

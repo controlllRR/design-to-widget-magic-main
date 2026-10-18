@@ -111,6 +111,13 @@ export const WIDGET_SCREENS: WidgetScreenEntry[] = [
     figmaStatus: "done",
   },
   {
+    slug: "measure-guide-height",
+    name: "Measure guide (height)",
+    nameRu: "Как измерить рост",
+    phase: "A",
+    figmaStatus: "done",
+  },
+  {
     slug: "configuring-generation",
     name: "Configuring Generation",
     nameRu: "Настройка генерации",

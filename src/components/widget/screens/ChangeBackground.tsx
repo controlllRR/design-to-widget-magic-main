@@ -39,10 +39,25 @@ export function ChangeBackground({
   const [selected, setSelected] = useState("studio-photo");
   const [uploadOpen, setUploadOpen] = useState(initialUploadOpen);
   const [customBg, setCustomBg] = useState<string | null>(null);
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set());
 
-  const tiles = customBg
-    ? [{ id: "custom-bg", label: s.background.addCustom, imageUrl: customBg }, ...catalogTiles]
-    : catalogTiles;
+  const tiles = (
+    customBg
+      ? [{ id: "custom-bg", label: s.background.addCustom, imageUrl: customBg }, ...catalogTiles]
+      : catalogTiles
+  ).filter((tile) => !hiddenIds.has(tile.id));
+
+  const handleRemove = (id: string) => {
+    if (id === "custom-bg") {
+      setCustomBg(null);
+    } else {
+      setHiddenIds((prev) => new Set(prev).add(id));
+    }
+    if (selected === id) {
+      const next = tiles.find((tile) => tile.id !== id);
+      setSelected(next?.id ?? "studio-photo");
+    }
+  };
 
   return (
     <div className="relative flex flex-col flex-1 min-h-0" style={widgetScreenShellStyle}>
@@ -72,6 +87,8 @@ export function ChangeBackground({
             onSelect={setSelected}
             query={query}
             selectionMode="radio"
+            removableIds={selected ? new Set([selected]) : undefined}
+            onRemove={handleRemove}
           />
         </div>
       </div>

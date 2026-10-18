@@ -19,10 +19,13 @@ export const FIGMA_NEW_PATH = {
     createProfileModelBoy: "717:3263",
     createProfileErrors: "1067:28034",
     uploadPhoto: "674:3723",
-    /** Figma: sheet «Как измерить рост» → ProfileHelpSheet, не InfoModal upload-tips. */
+    /** Sheet «Как измерить рост» → ProfileHelpSheet (не upload tips). */
     measureGuideHeight: "674:3415",
-    /** Upload tips — режим tips в PhotoUploadDialog (отдельного фрейма нет). */
-    infoModal: "674:3415",
+    /**
+     * Upload tips / examples — отдельного New path фрейма нет;
+     * gallery `info-modal` показывает InfoModal поверх upload-photo.
+     */
+    infoModal: "674:3723",
     configuringGeneration: "723:3176",
     preloaderV1: "1183:16399",
     preloaderV2: "1192:16812",

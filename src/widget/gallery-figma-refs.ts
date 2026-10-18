@@ -15,6 +15,7 @@ const SLUG_TO_FIGMA_KEY: Partial<
   "upload-photo": "uploadPhoto",
   "upload-photo-invalid": "uploadPhotoInvalid",
   "info-modal": "infoModal",
+  "measure-guide-height": "measureGuideHeight",
   "configuring-generation": "configuringGeneration",
   "generation-page": "generationPage",
   "generation-page-p2": "generationPageP2",

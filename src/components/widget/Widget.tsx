@@ -354,6 +354,15 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           <InfoModal onClose={() => navigate("upload-photo")} />
         </div>
       )}
+      {screen === "measure-guide-height" && (
+        <CreateProfile
+          variant="filled"
+          initialHelpSheet={{ type: "measure", fieldId: "height" }}
+          onOpenMenu={() => navigate("user-menu")}
+          onClose={() => navigate("start-page")}
+          onContinue={continueToConfiguring(saveProfile, navigate)}
+        />
+      )}
       {screen === "configuring-generation" && (
         <ConfiguringGeneration
           onOpenMenu={() => navigate("user-menu")}

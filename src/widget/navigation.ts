@@ -14,6 +14,7 @@ export type WidgetScreenId =
   | "upload-photo"
   | "upload-photo-invalid"
   | "info-modal"
+  | "measure-guide-height"
   | "configuring-generation"
   | "generation-page"
   | "generation-page-p2"

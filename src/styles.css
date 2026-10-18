@@ -164,29 +164,29 @@
   }
 }
 
-/* ===== Анимации логотипа магазина-хоста ===== */
+/* ===== Анимации логотипа магазина-хоста =====
+ * В keyframes — только литералы (не var()): иначе в части браузеров
+ * `to` отбрасывается, а fill-mode: both оставляет opacity: 0 навсегда.
+ * fill-mode: backwards — стартовый кадр на delay; финал = базовый .vf-logo.
+ */
 @keyframes vf-logo-fadeIn {
   from { opacity: 0; }
-  to   { opacity: var(--vf-logo-final-opacity, 0.85); }
 }
 @keyframes vf-logo-slideDown {
   from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: translateY(0); }
 }
 @keyframes vf-logo-scaleIn {
   from { opacity: 0; transform: scale(0.85); }
-  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: scale(1); }
 }
 @keyframes vf-logo-rotateIn {
   from { opacity: 0; transform: rotate(-8deg) scale(0.9); }
-  to   { opacity: var(--vf-logo-final-opacity, 0.85); transform: rotate(0) scale(1); }
 }
 @keyframes vf-logo-float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-4px); }
 }
 @keyframes vf-logo-pulse {
-  0%, 100% { opacity: var(--vf-logo-final-opacity, 0.85); }
+  0%, 100% { opacity: 0.85; }
   50%      { opacity: 1; }
 }
 @keyframes vf-logo-shimmer {
@@ -207,10 +207,10 @@
   opacity: var(--vf-logo-final-opacity, 0.85);
   will-change: transform, opacity;
 }
-.vf-logo-anim-fadeIn    { animation: vf-logo-fadeIn 0.9s ease-out both; }
-.vf-logo-anim-slideDown { animation: vf-logo-slideDown 0.9s cubic-bezier(0.22,1,0.36,1) both; }
-.vf-logo-anim-scaleIn   { animation: vf-logo-scaleIn 0.7s cubic-bezier(0.22,1,0.36,1) both; }
-.vf-logo-anim-rotateIn  { animation: vf-logo-rotateIn 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+.vf-logo-anim-fadeIn    { animation: vf-logo-fadeIn 0.9s ease-out backwards; }
+.vf-logo-anim-slideDown { animation: vf-logo-slideDown 0.9s cubic-bezier(0.22,1,0.36,1) backwards; }
+.vf-logo-anim-scaleIn   { animation: vf-logo-scaleIn 0.7s cubic-bezier(0.22,1,0.36,1) backwards; }
+.vf-logo-anim-rotateIn  { animation: vf-logo-rotateIn 0.8s cubic-bezier(0.22,1,0.36,1) backwards; }
 .vf-logo-anim-float     { animation: vf-logo-float 3.6s ease-in-out infinite; }
 .vf-logo-anim-pulse     { animation: vf-logo-pulse 2.4s ease-in-out infinite; }
 .vf-logo-anim-shimmer {

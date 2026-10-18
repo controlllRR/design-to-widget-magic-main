@@ -21,7 +21,7 @@ export interface InfoModalProps {
 
 /**
  * Upload tips / examples sheet (режим tips в PhotoUploadDialog).
- * Figma `674:3415` — отдельный фрейм «Как измерить рост» → ProfileHelpSheet.
+ * Замеры роста — отдельный фрейм Figma `674:3415` → ProfileHelpSheet / gallery `measure-guide-height`.
  */
 export function InfoModal({
   open = true,

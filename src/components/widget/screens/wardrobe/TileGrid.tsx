@@ -1,5 +1,5 @@
 import { type RefObject } from "react";
-import { Filter, Pencil, Plus, Search, X } from "lucide-react";
+import { Filter, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { TileMedia } from "@/components/widget/ui/TileMedia";
 import { WARDROBE_FIGMA_ICONS } from "./wardrobeIcons";
 import type { TileItem } from "./data";
@@ -295,19 +295,21 @@ export function TileCard({
           <button
             type="button"
             aria-label="Удалить"
-            className="absolute top-2 right-2 flex items-center justify-center rounded-full"
+            className="absolute flex items-center justify-center rounded-full"
             style={{
+              top: 8,
+              right: 8,
               width: 28,
               height: 28,
-              backgroundColor: "color-mix(in oklab, var(--vf-surface) 88%, transparent)",
-              border: "1px solid var(--vf-border)",
+              backgroundColor: "#ffffff",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
             }}
             onClick={(e) => {
               e.stopPropagation();
               onRemove?.();
             }}
           >
-            <X size={14} strokeWidth={1.5} style={{ color: "var(--vf-text)" }} />
+            <Trash2 size={14} strokeWidth={1.75} style={{ color: "var(--vf-text)" }} />
           </button>
         )}
       </div>
