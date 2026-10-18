@@ -4,7 +4,6 @@ import iconHanger from "@/assets/user-menu/icon-hanger.svg";
 import iconPinActive from "@/assets/user-menu/icon-pin-active.svg";
 import iconPinInactive from "@/assets/user-menu/icon-pin-inactive.svg";
 import iconProfile from "@/assets/user-menu/icon-profile.svg";
-import iconProfileHeader from "@/assets/user-menu/icon-profile-header.svg";
 import iconScissors from "@/assets/user-menu/icon-scissors.svg";
 import iconWardrobe from "@/assets/user-menu/icon-wardrobe.svg";
 
@@ -15,7 +14,7 @@ const MENU_ICONS: Record<UserMenuItemId, string> = {
   stylist: iconScissors,
 };
 
-/** Иконки user-menu — экспорт из Figma bridge (`674:3381`). */
+/** Иконки пунктов user-menu — экспорт из Figma bridge. */
 export function UserMenuItemIcon({
   id,
   size = 22,
@@ -39,19 +38,6 @@ export function UserMenuItemIcon({
       draggable={false}
       aria-hidden
       style={tone === "on-light" ? { filter: "brightness(0)" } : undefined}
-    />
-  );
-}
-
-export function UserMenuHeaderProfileIcon({ size = 24 }: { size?: number }) {
-  return (
-    <img
-      src={iconProfileHeader}
-      alt=""
-      width={size}
-      height={size}
-      draggable={false}
-      aria-hidden
     />
   );
 }

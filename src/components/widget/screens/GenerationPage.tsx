@@ -68,7 +68,6 @@ export interface GenerationPageProps {
   onLooksSelect?: () => void;
   /** Прелоадер «примерка» — управляется Widget, чтобы не сбрасывался при ре-рендере. */
   isGenerating?: boolean;
-  generatingVariant?: "v1" | "v2";
   onTryOn?: () => void;
   /** Gallery QA: открыть config sheet для вещи. */
   initialConfigItemId?: string;
@@ -100,7 +99,6 @@ export function GenerationPage({
   onShareNotice,
   onLooksSelect,
   isGenerating = false,
-  generatingVariant = "v1",
   onTryOn,
   initialConfigItemId,
   initialClearItemWarning = false,
@@ -345,7 +343,6 @@ export function GenerationPage({
           items={visibleOutfit}
           highlightedId={highlightOutfitId}
           onItemSelect={openItemConfig}
-          skeleton={isGenerating && generatingVariant === "v1"}
         />
 
         <div className="pt-2">

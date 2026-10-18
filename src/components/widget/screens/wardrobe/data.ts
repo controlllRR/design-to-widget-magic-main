@@ -17,7 +17,7 @@ import storeSneakers from "@/assets/store/tile-sneakers.png";
 import storeBag from "@/assets/store/tile-bag.png";
 import storeShirt from "@/assets/store/tile-shirt.png";
 import storeSkirt from "@/assets/store/tile-skirt.png";
-import storeDress from "@/assets/store/tile-dress.png";
+import storeDress from "@/assets/store/product-dress-3.png";
 import storeHeels from "@/assets/store/tile-heels.png";
 import storeCap from "@/assets/store/tile-cap.png";
 
@@ -26,7 +26,9 @@ export interface TileItem {
   label: string;
   tint?: string;
   imageUrl?: string;
-  /** true — рендерить imageUrl как видео (автоплей, loop, muted). */
+  /** Статичный постер для video-плиток. */
+  posterUrl?: string;
+  /** true — рендерить imageUrl как видео (ленивый play в viewport). */
   isVideo?: boolean;
   kind?: "item" | "set";
 }

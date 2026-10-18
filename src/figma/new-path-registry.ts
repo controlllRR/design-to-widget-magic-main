@@ -9,8 +9,8 @@ export const FIGMA_NEW_PATH = {
   screens: {
     startPage: "674:3338",
     startPageAlt: "674:4033",
-    userMenu: "674:3381",
-    userMenuV2: "1169:16134",
+    /** User-menu с аватаром в шапке (ранее v2 `1169:16134`; старый `674:3381` — иконка). */
+    userMenu: "1169:16134",
     createProfileEmpty: "674:4076",
     createProfileFilled: "674:4289",
     createProfileModelFemale: "674:4802",
@@ -27,7 +27,7 @@ export const FIGMA_NEW_PATH = {
      */
     infoModal: "674:3723",
     configuringGeneration: "723:3176",
-    preloaderV1: "1183:16399",
+    /** Актуальный прелоадер (карточки состава). Старый скелетон — `1183:16399`. */
     preloaderV2: "1192:16812",
     generationPage: "674:4649",
     generationListMore: "732:3913",
@@ -39,8 +39,8 @@ export const FIGMA_NEW_PATH = {
     addOutfitElement: "873:3554",
     addAccessory: "873:3585",
     generationLooksButton: "674:4741",
-    generationPageP2: "1211:24201",
-    generationPageP2V2: "1211:24713",
+    /** Актуальный P2 (бывший v2). Старый кадр — `1211:24201`. */
+    generationPageP2: "1211:24713",
     createProfileScrollParams: "1211:25283",
     popupWarning: "728:3667",
     popupWarningClearItem: "1159:15847",

@@ -152,12 +152,6 @@ export const LOGO_ANIMATION_OPTIONS: LogoAnimationOption[] = [
     group: "loop",
   },
   {
-    id: "nod",
-    label: "Кивок",
-    hint: "Кивок вверх-вниз",
-    group: "loop",
-  },
-  {
     id: "heartbeat",
     label: "Сердце",
     hint: "Двойной удар масштаба",
@@ -167,12 +161,6 @@ export const LOGO_ANIMATION_OPTIONS: LogoAnimationOption[] = [
     id: "jelly",
     label: "Желе",
     hint: "Упругая деформация",
-    group: "loop",
-  },
-  {
-    id: "spinSlow",
-    label: "Спин",
-    hint: "Медленное вращение",
     group: "loop",
   },
   // —— эффект ——

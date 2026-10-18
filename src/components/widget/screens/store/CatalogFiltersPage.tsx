@@ -61,11 +61,11 @@ function FilterCheckbox({
       style={{ minHeight: 16 }}
     >
       <span
-        className="shrink-0 flex items-center justify-center rounded-sm"
+        className="shrink-0 flex items-center justify-center rounded-sm box-border"
         style={{
           width: 16,
           height: 16,
-          border: "0.5px solid #343537",
+          border: "1px solid #343537",
           backgroundColor: checked ? "#343537" : "transparent",
         }}
         aria-hidden
@@ -167,15 +167,22 @@ function FilterSection({
         </div>
       </div>
       <div className={`vf-anim-expand${open ? " vf-anim-expand--open" : ""}`}>
-        <div
-          className="vf-anim-expand-inner flex flex-col"
-          style={{
-            gap: 10,
-            marginTop: 10,
-            ...(scrollInner ? { maxHeight: 172, overflowY: "auto", paddingRight: 4 } : {}),
-          }}
-        >
-          {children}
+        {/* overflow:hidden только здесь — иначе margin/scroll на том же узле дают «щель» при закрытии */}
+        <div className="vf-anim-expand-inner">
+          <div
+            className="flex flex-col"
+            style={{
+              gap: 10,
+              paddingTop: 10,
+              paddingLeft: 2,
+              paddingBottom: 2,
+              ...(scrollInner
+                ? { maxHeight: 172, overflowY: "auto", paddingRight: 4 }
+                : {}),
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

@@ -55,13 +55,6 @@ export const WIDGET_SCREENS: WidgetScreenEntry[] = [
     figmaStatus: "done",
   },
   {
-    slug: "user-menu-v2",
-    name: "User-menu v2",
-    nameRu: "Меню пользователя v2",
-    phase: "D",
-    figmaStatus: "done",
-  },
-  {
     slug: "create-profile-empty",
     name: "Create profile Empty",
     nameRu: "Создание профиля — пустой",
@@ -139,13 +132,6 @@ export const WIDGET_SCREENS: WidgetScreenEntry[] = [
     figmaStatus: "done",
   },
   {
-    slug: "generation-page-p2-v2",
-    name: "Generation page P2 v2",
-    nameRu: "Примерка P2 (вариант 2)",
-    phase: "D",
-    figmaStatus: "done",
-  },
-  {
     slug: "generation-item-config",
     name: "Item config sheet",
     nameRu: "Настройки вещи",
@@ -153,16 +139,9 @@ export const WIDGET_SCREENS: WidgetScreenEntry[] = [
     figmaStatus: "done",
   },
   {
-    slug: "preloader-v1",
-    name: "Preloader v1",
-    nameRu: "Прелоадер v1",
-    phase: "B",
-    figmaStatus: "done",
-  },
-  {
-    slug: "preloader-v2",
-    name: "Preloader v2",
-    nameRu: "Прелоадер v2",
+    slug: "preloader",
+    name: "Preloader",
+    nameRu: "Прелоадер",
     phase: "B",
     figmaStatus: "done",
   },

@@ -9,11 +9,13 @@ interface SplashSliderProps {
 }
 
 /**
- * Лёгкий fade-слайдер для splash-экрана. Без внешних зависимостей.
- * Пауза на hover/touch, точки-индикаторы, ARIA-метки.
+ * Лёгкий fade-слайдер для splash.
+ * Грузит только текущий + соседние слайды (не все 3–5 тяжёлых JPG сразу).
  */
 export function SplashSlider({ images, autoplayMs, initialIndex = 0 }: SplashSliderProps) {
-  const [index, setIndex] = useState(initialIndex);
+  const [index, setIndex] = useState(
+    Math.min(Math.max(0, initialIndex), Math.max(0, images.length - 1)),
+  );
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
@@ -34,6 +36,12 @@ export function SplashSlider({ images, autoplayMs, initialIndex = 0 }: SplashSli
     );
   }
 
+  const preloadIdx = new Set<number>([
+    index,
+    (index + 1) % images.length,
+    (index - 1 + images.length) % images.length,
+  ]);
+
   return (
     <div
       className="absolute inset-0"
@@ -44,19 +52,23 @@ export function SplashSlider({ images, autoplayMs, initialIndex = 0 }: SplashSli
       role="group"
       aria-roledescription="carousel"
     >
-      {images.map((src, i) => (
-        <div
-          key={src + i}
-          aria-hidden={i !== index}
-          className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-          style={{
-            backgroundImage: `url(${src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: i === index ? 1 : 0,
-          }}
-        />
-      ))}
+      {images.map((src, i) => {
+        if (!preloadIdx.has(i) && i !== index) return null;
+        return (
+          <div
+            key={src + i}
+            aria-hidden={i !== index}
+            className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+            style={{
+              backgroundImage: `url(${src})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              opacity: i === index ? 1 : 0,
+              pointerEvents: i === index ? "auto" : "none",
+            }}
+          />
+        );
+      })}
 
       {images.length > 1 && (
         <div className="absolute bottom-[16px] left-0 right-0 flex items-center justify-center gap-[6px]">

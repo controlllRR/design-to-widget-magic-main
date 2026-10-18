@@ -32,7 +32,8 @@ export function AnimateImage({
     label: s.animate.tiles[tile.id] ?? tile.label,
   }));
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState("pose-v1");
+  const [selected, setSelected] = useState<string | null>(null);
+  const canApply = Boolean(selected);
 
   return (
     <div className="relative flex flex-col flex-1 min-h-0" style={widgetScreenShellStyle}>
@@ -66,9 +67,10 @@ export function AnimateImage({
       <div className="flex gap-2.5 px-3 pt-3 pb-0 shrink-0">
         <button
           type="button"
-          onClick={() => onApply?.(selected)}
-          className="flex-1 text-xs font-bold uppercase tracking-wide"
-          style={primaryButtonStyle(true)}
+          disabled={!canApply}
+          onClick={() => selected && onApply?.(selected)}
+          className="flex-1 text-xs font-bold uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-40"
+          style={primaryButtonStyle(canApply)}
         >
           {s.common.apply}
         </button>

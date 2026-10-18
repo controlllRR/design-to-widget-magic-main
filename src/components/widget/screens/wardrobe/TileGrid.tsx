@@ -163,18 +163,21 @@ export function SearchFilterBar({
 function SelectionRadio() {
   return (
     <span
-      className="absolute top-2 left-2 flex items-center justify-center rounded-full"
+      className="absolute flex items-center justify-center rounded-full"
       style={{
+        top: 10,
+        left: 10,
         width: 18,
         height: 18,
         backgroundColor: "var(--vf-text)",
-        border: "2px solid var(--vf-surface)",
+        border: "2px solid #ffffff",
+        boxSizing: "border-box",
       }}
       aria-hidden
     >
       <span
         className="rounded-full"
-        style={{ width: 6, height: 6, backgroundColor: "var(--vf-surface)" }}
+        style={{ width: 6, height: 6, backgroundColor: "#ffffff" }}
       />
     </span>
   );
@@ -184,6 +187,7 @@ export function TileCard({
   label,
   tint,
   imageUrl,
+  posterUrl,
   isVideo,
   selected,
   add,
@@ -198,6 +202,7 @@ export function TileCard({
   label: string;
   tint?: string;
   imageUrl?: string;
+  posterUrl?: string;
   isVideo?: boolean;
   selected?: boolean;
   add?: boolean;
@@ -229,27 +234,35 @@ export function TileCard({
         style={{
           height: tileHeight,
           borderRadius: tileRadius,
-          backgroundColor: add ? "var(--vf-surface)" : (tint ?? "var(--vf-surface-muted)"),
+          /* Белый, не surface-muted: на фото с белым фоном AA скругления иначе выглядит как «кружок» */
+          backgroundColor: add ? "var(--vf-surface)" : (tint ?? "#ffffff"),
           border: add ? addBorder : borderStyle,
         }}
       >
-        {add ? (
-          isWardrobe ? (
-            <img
-              src={WARDROBE_FIGMA_ICONS.plus}
-              alt=""
-              aria-hidden
-              style={{ width: 32, height: 32 }}
-              draggable={false}
+        <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
+          {add ? (
+            isWardrobe ? (
+              <img
+                src={WARDROBE_FIGMA_ICONS.plus}
+                alt=""
+                aria-hidden
+                style={{ width: 32, height: 32 }}
+                draggable={false}
+              />
+            ) : (
+              <Plus size={32} strokeWidth={1.25} style={{ color: "var(--vf-text-muted)" }} />
+            )
+          ) : imageUrl ? (
+            <TileMedia
+              src={imageUrl}
+              isVideo={isVideo}
+              poster={posterUrl}
+              preferPlay={Boolean(selected)}
             />
-          ) : (
-            <Plus size={32} strokeWidth={1.25} style={{ color: "var(--vf-text-muted)" }} />
-          )
-        ) : imageUrl ? (
-          <TileMedia src={imageUrl} isVideo={isVideo} />
-        ) : tint ? (
-          <div className="w-full h-full" style={{ backgroundColor: tint }} />
-        ) : null}
+          ) : tint ? (
+            <div className="w-full h-full" style={{ backgroundColor: tint }} />
+          ) : null}
+        </div>
         {selected && selectionMode === "radio" && <SelectionRadio />}
         {editable && !add && (
           <span
@@ -393,6 +406,7 @@ export function TileGrid({
           label={item.label}
           tint={item.tint}
           imageUrl={item.imageUrl}
+          posterUrl={item.posterUrl}
           isVideo={item.isVideo}
           selected={selectedId === item.id}
           editable={editable}
@@ -435,6 +449,7 @@ export function TileGrid({
               label={item.label}
               tint={item.tint}
               imageUrl={item.imageUrl}
+              posterUrl={item.posterUrl}
               isVideo={item.isVideo}
               selected={selectedId === item.id}
               editable={editable}

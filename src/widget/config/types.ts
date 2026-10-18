@@ -89,10 +89,8 @@ export type LogoAnimationId =
   | "wiggle"
   | "swing"
   | "sway"
-  | "nod"
   | "heartbeat"
   | "jelly"
-  | "spinSlow"
   | "shimmer"
   | "glow"
   | "glitch"
@@ -113,6 +111,11 @@ export interface BrandConfig {
    * или картинка не загрузилась.
    */
   logoAlt: string;
+  /**
+   * CSS font-family для текстового логотипа (когда logoUrl пустой).
+   * Картинку не затрагивает.
+   */
+  logoFont: string;
   /** Внешняя ссылка с логотипа (на главную сайта-хоста). */
   siteUrl?: string;
   /** Включена ли анимация логотипа. */
@@ -140,6 +143,8 @@ export interface ConfigTile {
   id: string;
   label: string;
   image?: string;
+  /** Статичный постер для video-плиток — сетка не декодирует все ролики сразу. */
+  poster?: string;
   tint?: string;
 }
 

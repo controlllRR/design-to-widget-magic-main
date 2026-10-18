@@ -11,8 +11,6 @@ export interface UserMenuProps {
   onSelect?: (id: UserMenuItemId) => void;
   /** Подсветка текущего раздела — Figma `#4a4b4d`. */
   activeId?: UserMenuItemId;
-  /** v1 — иконка профиля; v2 — фото аватара в шапке (`1169:16134`). */
-  variant?: "v1" | "v2";
 }
 
 const MENU_BG = "#343537";
@@ -21,19 +19,17 @@ const LEGAL_COLOR = "#ced0d3";
 const HEADER_BORDER = "#f6f6f6";
 
 /**
- * User-menu — Figma `674:3381` / `1169:16134`.
+ * User-menu — Figma `1169:16134` (аватар в шапке).
  * Спеки: figma-bridge get_node, без cloud API.
  */
 export function UserMenu({
   onClose,
   onSelect,
   activeId = "profile",
-  variant = "v1",
 }: UserMenuProps) {
   const { config } = useWidgetConfig();
   const { userMenu, locale, i18n } = config;
   const copy = i18n[locale];
-  const isV2 = variant === "v2";
   const { pinnedIds, togglePin } = useUserMenuPins();
 
   const items = userMenu.items.filter((i) => i.enabled);
@@ -64,7 +60,6 @@ export function UserMenu({
         variant="dark"
         menuIcon="close"
         hideTrailingClose
-        profileVisual={isV2 ? "avatar" : "user-circle"}
         headerBorderColor={HEADER_BORDER}
         onMenu={onClose}
         onProfile={() => handleItem("profile")}

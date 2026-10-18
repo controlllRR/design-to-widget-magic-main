@@ -1,64 +1,108 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { isVideoMediaRef } from "@/lib/mediaUrl";
+import {
+  claimVideoSlot,
+  releaseVideoSlot,
+  updateVideoSlotPriority,
+} from "@/lib/videoPlayPool";
 
 /**
  * За сколько секунд до EOF перезапускать ролик.
- * Нативный `loop` в Chrome/Safari даёт короткий пустой (белый) кадр на стыке —
- * ранний seek этого избегает.
+ * Нативный `loop` даёт короткий blank на стыке — ранний seek этого избегает.
  */
 const LOOP_LEAD_SEC = 1 / 24;
 
-/** Превью плитки — статичное фото или бесшовно зацикленное беззвучное видео. */
+/**
+ * Превью плитки: фото или видео.
+ * Видео всегда остаётся видео; play только в viewport и не больше лимита пула
+ * (чтобы сетка поз не валила вкладку).
+ */
 export function TileMedia({
   src,
   isVideo,
+  poster,
+  preferPlay = false,
   className = "w-full h-full object-cover",
 }: {
   src: string;
   isVideo?: boolean;
+  poster?: string;
+  preferPlay?: boolean;
   className?: string;
 }) {
   const video = isVideo ?? isVideoMediaRef(src);
 
   if (video) {
-    return <SeamlessLoopVideo src={src} className={className} />;
+    return (
+      <LazyLoopVideo
+        src={src}
+        poster={poster}
+        preferPlay={preferPlay}
+        className={className}
+      />
+    );
   }
 
-  return <img src={src} alt="" className={className} draggable={false} />;
+  return (
+    <img
+      src={src}
+      alt=""
+      className={className}
+      draggable={false}
+      loading="lazy"
+      decoding="async"
+    />
+  );
 }
 
-function SeamlessLoopVideo({ src, className }: { src: string; className: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  /** Первый кадр под видео — закрывает blank при seek (иначе виден светлый фон плитки). */
-  const [underlay, setUnderlay] = useState<string | null>(null);
+function LazyLoopVideo({
+  src,
+  poster,
+  preferPlay,
+  className,
+}: {
+  src: string;
+  poster?: string;
+  preferPlay: boolean;
+  className: string;
+}) {
+  const reactId = useId();
+  const slotIdRef = useRef<symbol | null>(null);
+  if (!slotIdRef.current) {
+    slotIdRef.current = Symbol(`vf-video-${reactId}`);
+  }
+  const slotId = slotIdRef.current;
+
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [inView, setInView] = useState(false);
+  /** Монтируем <video> после первого появления — до этого только poster. */
+  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
-    setUnderlay(null);
-    const el = ref.current;
-    if (!el) return;
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      setArmed(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const visible = Boolean(entry?.isIntersecting);
+        setInView(visible);
+        if (visible) setArmed(true);
+      },
+      { root: null, rootMargin: "100px", threshold: 0.1 },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!armed || !el) return;
 
     let restarting = false;
-    let cancelled = false;
-    let captured = false;
-
-    const captureUnderlay = () => {
-      if (cancelled || captured) return;
-      try {
-        const w = el.videoWidth;
-        const h = el.videoHeight;
-        if (!w || !h) return;
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.min(w, 320);
-        canvas.height = Math.round((canvas.width / w) * h);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        ctx.drawImage(el, 0, 0, canvas.width, canvas.height);
-        captured = true;
-        setUnderlay(canvas.toDataURL("image/jpeg", 0.7));
-      } catch {
-        // CORS / decode — подложка не критична
-      }
-    };
 
     const restart = () => {
       if (restarting) return;
@@ -70,7 +114,6 @@ function SeamlessLoopVideo({ src, className }: { src: string; className: string 
       };
       el.addEventListener("seeked", onSeeked);
       try {
-        // Чуть > 0 — в части браузеров seek ровно в 0 даёт краткий blank.
         el.currentTime = 0.001;
       } catch {
         restarting = false;
@@ -83,49 +126,71 @@ function SeamlessLoopVideo({ src, className }: { src: string; className: string 
       if (el.currentTime >= duration - LOOP_LEAD_SEC) restart();
     };
 
-    const onEnded = () => restart();
-    const onLoadedData = () => captureUnderlay();
-
     el.addEventListener("timeupdate", onTimeUpdate);
-    el.addEventListener("ended", onEnded);
-    el.addEventListener("loadeddata", onLoadedData);
-    if (el.readyState >= 2) captureUnderlay();
-    void el.play().catch(() => undefined);
+    el.addEventListener("ended", restart);
 
     return () => {
-      cancelled = true;
       el.removeEventListener("timeupdate", onTimeUpdate);
-      el.removeEventListener("ended", onEnded);
-      el.removeEventListener("loadeddata", onLoadedData);
+      el.removeEventListener("ended", restart);
+      el.pause();
     };
-    // underlay намеренно не в deps — иначе перезахват и цикл
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- capture once per src
-  }, [src]);
+  }, [armed, src]);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!armed || !el) return;
+
+    if (!inView && !preferPlay) {
+      releaseVideoSlot(slotId);
+      el.pause();
+      return;
+    }
+
+    const priority = preferPlay ? 100 : 10;
+    claimVideoSlot(slotId, priority, {
+      play: () => {
+        void el.play().catch(() => undefined);
+      },
+      pause: () => {
+        el.pause();
+      },
+    });
+    updateVideoSlotPriority(slotId, priority);
+
+    return () => {
+      releaseVideoSlot(slotId);
+    };
+  }, [armed, inView, preferPlay, slotId, src]);
 
   return (
-    <span className="relative block w-full h-full overflow-hidden">
-      {underlay ? (
+    <span ref={rootRef} className="relative block w-full h-full overflow-hidden">
+      {poster ? (
         <img
-          src={underlay}
+          src={poster}
           alt=""
           aria-hidden
           className={className}
           style={{ position: "absolute", inset: 0 }}
           draggable={false}
+          loading="lazy"
+          decoding="async"
         />
       ) : null}
-      <video
-        ref={ref}
-        src={src}
-        className={className}
-        style={{ position: "relative", backgroundColor: "transparent" }}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        disablePictureInPicture
-        draggable={false}
-      />
+      {armed ? (
+        <video
+          key={src}
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          className={className}
+          style={{ position: "relative", backgroundColor: "transparent" }}
+          muted
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+          draggable={false}
+        />
+      ) : null}
     </span>
   );
 }

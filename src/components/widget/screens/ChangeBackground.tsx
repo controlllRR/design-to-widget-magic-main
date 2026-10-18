@@ -39,28 +39,16 @@ export function ChangeBackground({
     label: s.background.tiles[tile.id] ?? tile.label,
   }));
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState("studio-photo");
+  /** Ничего не выбрано → на плитках нет кружка, пока пользователь не кликнет. */
+  const [selected, setSelected] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(initialUploadOpen);
   const [customBg, setCustomBg] = useState<string | null>(null);
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set());
 
-  const tiles = (
-    customBg
-      ? [{ id: "custom-bg", label: s.background.addCustom, imageUrl: customBg }, ...catalogTiles]
-      : catalogTiles
-  ).filter((tile) => !hiddenIds.has(tile.id));
+  const tiles = customBg
+    ? [{ id: "custom-bg", label: s.background.addCustom, imageUrl: customBg }, ...catalogTiles]
+    : catalogTiles;
 
-  const handleRemove = (id: string) => {
-    if (id === "custom-bg") {
-      setCustomBg(null);
-    } else {
-      setHiddenIds((prev) => new Set(prev).add(id));
-    }
-    if (selected === id) {
-      const next = tiles.find((tile) => tile.id !== id);
-      setSelected(next?.id ?? "studio-photo");
-    }
-  };
+  const canApply = Boolean(selected);
 
   return (
     <div className="relative flex flex-col flex-1 min-h-0" style={widgetScreenShellStyle}>
@@ -90,8 +78,6 @@ export function ChangeBackground({
             onSelect={setSelected}
             query={query}
             selectionMode="radio"
-            removableIds={selected ? new Set([selected]) : undefined}
-            onRemove={handleRemove}
           />
         </div>
       </div>
@@ -99,9 +85,10 @@ export function ChangeBackground({
       <div className="flex gap-2.5 px-3 pt-3 pb-0 shrink-0">
         <button
           type="button"
-          onClick={() => onApply?.(selected)}
-          className="flex-1 text-xs font-bold uppercase tracking-wide"
-          style={primaryButtonStyle(true)}
+          disabled={!canApply}
+          onClick={() => selected && onApply?.(selected)}
+          className="flex-1 text-xs font-bold uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-40"
+          style={primaryButtonStyle(canApply)}
         >
           {s.common.apply}
         </button>

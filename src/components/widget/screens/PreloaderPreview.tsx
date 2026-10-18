@@ -13,12 +13,11 @@ import {
 import { widgetScreenShellStyle } from "@/components/widget/ui/screenShell";
 
 export interface PreloaderPreviewProps {
-  variant?: "v1" | "v2";
   onDone?: () => void;
 }
 
-/** Preloader Preview — Figma `1183:16399` / `1192:16812`. */
-export function PreloaderPreview({ variant = "v1", onDone }: PreloaderPreviewProps) {
+/** Preloader Preview — Figma `1192:16812` (состав с карточками, без скелетона). */
+export function PreloaderPreview({ onDone }: PreloaderPreviewProps) {
   const { t } = useWidgetConfig();
   const { heroImage } = useWidgetProfile();
   const loading = true;
@@ -46,7 +45,7 @@ export function PreloaderPreview({ variant = "v1", onDone }: PreloaderPreviewPro
           <GenerationToolbar primaryLabel={t.screens.generation.tryOn} disabled={loading} />
         </div>
 
-        <OutfitComposition items={PRELOADER_OUTFIT} skeleton={variant === "v1"} />
+        <OutfitComposition items={PRELOADER_OUTFIT} />
 
         <div className="pt-2">
           <SizeWarningBanner />

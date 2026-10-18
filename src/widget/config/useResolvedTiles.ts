@@ -56,27 +56,30 @@ export function useTileMediaPreview(ref?: string): { src: string; isVideo: boole
   return state;
 }
 
+function catalogKey(tiles: ConfigTile[]): string {
+  return tiles
+    .map(
+      (tile) =>
+        `${tile.id}\0${tile.image ?? ""}\0${tile.poster ?? ""}\0${tile.label}\0${tile.tint ?? ""}`,
+    )
+    .join("\n");
+}
+
 /** ConfigTile[] → TileItem[] с разрешёнными imageUrl (в т.ч. vf-idb://). */
 export function useResolvedConfigTiles(tiles: ConfigTile[]): TileItem[] {
   const [resolvedImages, setResolvedImages] = useState<Record<string, ResolvedTileMedia>>({});
-
-  const imageKeys = useMemo(
-    () =>
-      tiles
-        .map((tile) => tile.image)
-        .filter((image): image is string => Boolean(image))
-        .join("\0"),
-    [tiles],
-  );
+  const key = catalogKey(tiles);
 
   useEffect(() => {
     let cancelled = false;
     const objectUrls: string[] = [];
+    // Снимок на момент смены key — не зависит от новой ссылки на массив каждый рендер.
+    const snapshot = tiles;
 
     async function load() {
       const next: Record<string, ResolvedTileMedia> = {};
       await Promise.all(
-        tiles.map(async (tile) => {
+        snapshot.map(async (tile) => {
           if (!tile.image) return;
           if (isMediaIdbRef(tile.image)) {
             const blob = await getMediaBlob(tile.image);
@@ -100,7 +103,9 @@ export function useResolvedConfigTiles(tiles: ConfigTile[]): TileItem[] {
       cancelled = true;
       for (const url of objectUrls) URL.revokeObjectURL(url);
     };
-  }, [imageKeys, tiles]);
+    // tiles читаем только при смене key (содержимое каталога).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- key сериализует tiles
+  }, [key]);
 
   return useMemo(
     () =>
@@ -108,9 +113,12 @@ export function useResolvedConfigTiles(tiles: ConfigTile[]): TileItem[] {
         id: tile.id,
         label: tile.label,
         tint: tile.tint,
-        imageUrl: tile.image ? resolvedImages[tile.id]?.url : undefined,
-        isVideo: tile.image ? resolvedImages[tile.id]?.isVideo : undefined,
+        imageUrl: tile.image ? resolvedImages[tile.id]?.url ?? tile.image : undefined,
+        posterUrl: tile.poster,
+        isVideo: tile.image
+          ? (resolvedImages[tile.id]?.isVideo ?? isVideoMediaRef(tile.image))
+          : undefined,
       })),
-    [tiles, resolvedImages],
+    [tiles, resolvedImages, key],
   );
 }

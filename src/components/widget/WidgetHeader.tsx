@@ -5,7 +5,6 @@ import { useWidgetProfileOptional, profileAvatarImageStyle } from "@/widget/Widg
 import {
   USER_MENU_ARIA_LABELS,
   UserMenuCloseIcon,
-  UserMenuHeaderProfileIcon,
   UserMenuItemIcon,
 } from "@/components/widget/ui/UserMenuIcons";
 import { useUserMenuPins } from "@/widget/user-menu/useUserMenuPins";
@@ -24,10 +23,8 @@ interface WidgetHeaderProps {
   variant?: "light" | "dark";
   /** Показывать закреплённые ярлыки после профиля. */
   showPinnedShortcuts?: boolean;
-  /** User-menu: без правого крестика — Figma `674:3381`. */
+  /** User-menu: без правого крестика. */
   hideTrailingClose?: boolean;
-  /** User-menu v1 — user-circle; v2 — фото. */
-  profileVisual?: "avatar" | "user-circle";
   /** Цвет нижней границы шапки (user-menu: `#f6f6f6`). */
   headerBorderColor?: string;
 }
@@ -43,7 +40,6 @@ export function WidgetHeader({
   variant = "light",
   showPinnedShortcuts = true,
   hideTrailingClose = false,
-  profileVisual = "avatar",
   headerBorderColor,
 }: WidgetHeaderProps) {
   const menuAria = menuIcon === "close" ? "Закрыть меню" : "Меню";
@@ -95,22 +91,18 @@ export function WidgetHeader({
           paddingBlock: "var(--vf-sp-14)",
         }}
       >
-        {profileVisual === "user-circle" ? (
-          <UserMenuHeaderProfileIcon size={24} />
-        ) : (
-          <span
-            className="shrink-0 overflow-hidden rounded-full"
-            style={{ width: 24, height: 24 }}
-          >
-            <img
-              src={avatarSrc}
-              alt=""
-              className="w-full h-full object-cover"
-              style={avatarStyle}
-              draggable={false}
-            />
-          </span>
-        )}
+        <span
+          className="shrink-0 overflow-hidden rounded-full"
+          style={{ width: 24, height: 24 }}
+        >
+          <img
+            src={avatarSrc}
+            alt=""
+            className="w-full h-full object-cover"
+            style={avatarStyle}
+            draggable={false}
+          />
+        </span>
         <span
           className="leading-[1.2] lowercase vf-header-profile-label"
           style={{

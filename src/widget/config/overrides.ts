@@ -10,6 +10,9 @@ const EVENT_NAME = "vf:widget-overrides-changed";
 
 export type WidgetOverrides = DeepPartial<WidgetConfig>;
 
+/** Пока пишем из этого таба — игнор собственного EVENT_NAME (без лишнего setState). */
+let writingLocally = false;
+
 export function readOverrides(): WidgetOverrides {
   if (typeof window === "undefined") return {};
   try {
@@ -26,10 +29,13 @@ export function readOverrides(): WidgetOverrides {
 function writeOverrides(next: WidgetOverrides) {
   if (typeof window === "undefined") return;
   try {
+    writingLocally = true;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     window.dispatchEvent(new CustomEvent(EVENT_NAME));
   } catch (err) {
     console.error("[VirtuFit] failed to save overrides", err);
+  } finally {
+    writingLocally = false;
   }
 }
 
@@ -52,7 +58,10 @@ export function useWidgetOverrides(): [
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const sync = () => setState(readOverrides());
+    const sync = () => {
+      if (writingLocally) return;
+      setState(readOverrides());
+    };
     window.addEventListener("storage", sync);
     window.addEventListener(EVENT_NAME, sync as EventListener);
     return () => {
@@ -77,8 +86,13 @@ export function useWidgetOverrides(): [
 
   const reset = useCallback(() => {
     if (typeof window !== "undefined") {
-      window.localStorage.removeItem(STORAGE_KEY);
-      window.dispatchEvent(new CustomEvent(EVENT_NAME));
+      writingLocally = true;
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.dispatchEvent(new CustomEvent(EVENT_NAME));
+      } finally {
+        writingLocally = false;
+      }
     }
     setState({});
   }, []);

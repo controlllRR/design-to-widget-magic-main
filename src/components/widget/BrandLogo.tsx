@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import defaultLogoUrl from "@/assets/brand/default-logo.svg";
-import type { LogoAnimationId } from "@/widget/config";
+import { isLogoAnimationId, type LogoAnimationId } from "@/widget/config";
 import { isMediaIdbRef, resolveMediaRef } from "@/widget/config/media-assets";
 
 interface BrandLogoProps {
@@ -85,7 +85,10 @@ export function BrandLogo({
   }
 
   const animEnabled = enabledOverride ?? brand.logoAnimationEnabled;
-  const animation: LogoAnimationId = animationOverride ?? brand.logoAnimation;
+  const rawAnimation = animationOverride ?? brand.logoAnimation;
+  const animation: LogoAnimationId = isLogoAnimationId(rawAnimation)
+    ? rawAnimation
+    : "fadeIn";
   const invert = invertOverride ?? brand.logoInvert;
 
   const animClass = animEnabled ? `vf-logo-anim-${animation}` : "";
@@ -99,13 +102,17 @@ export function BrandLogo({
     filter: invert ? "brightness(0) invert(1)" : undefined,
   };
 
+  const logoFont =
+    brand.logoFont?.trim() ||
+    "var(--vf-font-heading, 'Manrope', sans-serif)";
+
   const altFallback = (
     <span
       className="uppercase truncate"
       style={{
         fontSize: 12,
         color: invert ? "#ffffff" : "#111111",
-        fontFamily: "var(--vf-font-heading, 'Manrope', sans-serif)",
+        fontFamily: logoFont,
         fontWeight: 600,
         letterSpacing: "0.12em",
       }}

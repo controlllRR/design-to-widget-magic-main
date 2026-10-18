@@ -120,14 +120,17 @@ export function WidgetConfigProvider({ config: partial, children }: ProviderProp
     });
   }, [effectiveTheme, locale, merged.splash.enabled, merged.splash.images.length]);
 
-  const value: WidgetConfigContextValue = {
-    config: merged,
-    activeColors,
-    effectiveTheme,
-    t,
-    setThemeMode,
-    setLocale,
-  };
+  const value = useMemo<WidgetConfigContextValue>(
+    () => ({
+      config: merged,
+      activeColors,
+      effectiveTheme,
+      t,
+      setThemeMode,
+      setLocale,
+    }),
+    [merged, activeColors, effectiveTheme, t],
+  );
 
   return (
     <WidgetConfigContext.Provider value={value}>

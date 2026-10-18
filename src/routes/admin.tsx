@@ -34,6 +34,7 @@ import type {
   LogoAnimationId,
   ProfilePhotoSlotId,
 } from "@/widget/config/types";
+import { isLogoAnimationId } from "@/widget/config/logoAnimations";
 import { TileMedia } from "@/components/widget/ui/TileMedia";
 import {
   defaultUploadExamples,
@@ -210,16 +211,25 @@ function SplashSlideThumb({ refId }: { refId: string }) {
   );
 }
 
-/** Список слайдов splash с HTML5 drag-and-drop для смены порядка. */
-function SplashSlidesList({
-  images,
-  onReorder,
-  onRemove,
-}: {
-  images: string[];
-  onReorder: (next: string[]) => void;
-  onRemove: (index: number) => void;
-}) {
+function moveListItem<T>(list: T[], fromIndex: number, toIndex: number): T[] | null {
+  if (
+    fromIndex === toIndex ||
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= list.length ||
+    toIndex >= list.length
+  ) {
+    return null;
+  }
+  const next = [...list];
+  const [moved] = next.splice(fromIndex, 1);
+  if (moved === undefined) return null;
+  next.splice(toIndex, 0, moved);
+  return next;
+}
+
+/** Общий HTML5 DnD для списков админки (заставка, фоны, позы, примеры). */
+function useListDragReorder() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
 
@@ -235,18 +245,18 @@ function SplashSlidesList({
     if (overIndex !== index) setOverIndex(index);
   };
 
-  const handleDrop = (e: DragEvent, toIndex: number) => {
+  const handleDrop = (
+    e: DragEvent,
+    toIndex: number,
+    onMove: (fromIndex: number, toIndex: number) => void,
+  ) => {
     e.preventDefault();
     const fromRaw = e.dataTransfer.getData("text/plain");
     const fromIndex = fromRaw ? Number(fromRaw) : dragIndex;
     setDragIndex(null);
     setOverIndex(null);
     if (fromIndex === null || Number.isNaN(fromIndex) || fromIndex === toIndex) return;
-    const next = [...images];
-    const [moved] = next.splice(fromIndex, 1);
-    if (!moved) return;
-    next.splice(toIndex, 0, moved);
-    onReorder(next);
+    onMove(fromIndex, toIndex);
   };
 
   const handleDragEnd = () => {
@@ -254,60 +264,103 @@ function SplashSlidesList({
     setOverIndex(null);
   };
 
+  const rowClass = (index: number) => {
+    const isDragging = dragIndex === index;
+    const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
+    return `transition-colors ${
+      isDragging
+        ? "opacity-50 border-neutral-400"
+        : isOver
+          ? "border-neutral-900 ring-2 ring-neutral-900/20"
+          : "border-neutral-200"
+    }`;
+  };
+
+  return {
+    dragIndex,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragEnd,
+    rowClass,
+  };
+}
+
+function DragHandle({ label }: { label: string }) {
+  return (
+    <span
+      className="shrink-0 text-neutral-400 cursor-grab active:cursor-grabbing touch-none"
+      aria-hidden
+      title={label}
+    >
+      <GripVertical size={18} strokeWidth={1.75} />
+    </span>
+  );
+}
+
+/** Список слайдов splash с HTML5 drag-and-drop для смены порядка. */
+function SplashSlidesList({
+  images,
+  onReorder,
+  onRemove,
+}: {
+  images: string[];
+  onReorder: (next: string[]) => void;
+  onRemove: (index: number) => void;
+}) {
+  const dnd = useListDragReorder();
+
   return (
     <ul className="space-y-3" aria-label="Слайды заставки, перетащите для смены порядка">
-      {images.map((refId, index) => {
-        const isDragging = dragIndex === index;
-        const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
-        return (
-          <li
-            key={`${refId}-${index}`}
-            draggable
-            onDragStart={(e) => handleDragStart(e, index)}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDrop={(e) => handleDrop(e, index)}
-            onDragEnd={handleDragEnd}
-            title="Перетащите, чтобы изменить порядок слайда"
-            className={`flex gap-2 items-center p-3 rounded-lg border bg-neutral-50 cursor-grab active:cursor-grabbing select-none transition-colors ${
-              isDragging
-                ? "opacity-50 border-neutral-400"
-                : isOver
-                  ? "border-neutral-900 ring-2 ring-neutral-900/20"
-                  : "border-neutral-200"
-            }`}
+      {images.map((refId, index) => (
+        <li
+          key={`${refId}-${index}`}
+          draggable
+          onDragStart={(e) => dnd.handleDragStart(e, index)}
+          onDragOver={(e) => dnd.handleDragOver(e, index)}
+          onDrop={(e) =>
+            dnd.handleDrop(e, index, (from, to) => {
+              const next = moveListItem(images, from, to);
+              if (next) onReorder(next);
+            })
+          }
+          onDragEnd={dnd.handleDragEnd}
+          title="Перетащите, чтобы изменить порядок слайда"
+          className={`flex gap-2 items-center p-3 rounded-lg border bg-neutral-50 cursor-grab active:cursor-grabbing select-none ${dnd.rowClass(index)}`}
+        >
+          <DragHandle label="Потяните за строку" />
+          <SplashSlideThumb refId={refId} />
+          <span className="flex-1 text-sm text-neutral-700">Слайд {index + 1}</span>
+          <button
+            type="button"
+            onClick={() => onRemove(index)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.preventDefault()}
+            disabled={images.length <= 1}
+            title={
+              images.length <= 1
+                ? "Нужен хотя бы один слайд"
+                : `Удалить слайд ${index + 1}`
+            }
+            className="shrink-0 text-xs text-red-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
-            <span
-              className="shrink-0 text-neutral-400"
-              aria-hidden
-              title="Потяните за строку"
-            >
-              <GripVertical size={18} strokeWidth={1.75} />
-            </span>
-            <SplashSlideThumb refId={refId} />
-            <span className="flex-1 text-sm text-neutral-700">Слайд {index + 1}</span>
-            <button
-              type="button"
-              onClick={() => onRemove(index)}
-              onMouseDown={(e) => e.stopPropagation()}
-              onDragStart={(e) => e.preventDefault()}
-              disabled={images.length <= 1}
-              title={
-                images.length <= 1
-                  ? "Нужен хотя бы один слайд"
-                  : `Удалить слайд ${index + 1}`
-              }
-              className="shrink-0 text-xs text-red-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              Удалить
-            </button>
-          </li>
-        );
-      })}
+            Удалить
+          </button>
+        </li>
+      ))}
     </ul>
   );
 }
 
-function TileCatalogThumb({ image, tint }: { image?: string; tint?: string }) {
+function TileCatalogThumb({
+  image,
+  poster,
+  tint,
+}: {
+  image?: string;
+  poster?: string;
+  tint?: string;
+}) {
   const { src, isVideo } = useTileMediaPreview(image);
   return (
     <div
@@ -319,7 +372,12 @@ function TileCatalogThumb({ image, tint }: { image?: string; tint?: string }) {
       }}
     >
       {src ? (
-        <TileMedia src={src} isVideo={isVideo} className="w-full h-full object-cover" />
+        <TileMedia
+          src={src}
+          isVideo={isVideo}
+          poster={poster}
+          className="w-full h-full object-cover"
+        />
       ) : tint ? null : (
         <div className="w-full h-full bg-neutral-200 animate-pulse" />
       )}
@@ -353,6 +411,57 @@ function ExampleThumb({ refId, variant }: { refId: string; variant: "good" | "ba
   );
 }
 
+function ExampleThumbsReorderList({
+  refs,
+  variant,
+  ariaLabel,
+  onReorder,
+  onRemove,
+}: {
+  refs: string[];
+  variant: "good" | "bad";
+  ariaLabel: string;
+  onReorder: (next: string[]) => void;
+  onRemove: (index: number) => void;
+}) {
+  const dnd = useListDragReorder();
+
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label={ariaLabel}>
+      {refs.map((refId, index) => (
+        <li
+          key={`${refId}-${index}`}
+          draggable
+          onDragStart={(e) => dnd.handleDragStart(e, index)}
+          onDragOver={(e) => dnd.handleDragOver(e, index)}
+          onDrop={(e) =>
+            dnd.handleDrop(e, index, (from, to) => {
+              const next = moveListItem(refs, from, to);
+              if (next) onReorder(next);
+            })
+          }
+          onDragEnd={dnd.handleDragEnd}
+          title="Перетащите, чтобы изменить порядок"
+          className={`relative rounded-lg border bg-white cursor-grab active:cursor-grabbing select-none p-1 ${dnd.rowClass(index)}`}
+        >
+          <ExampleThumb refId={refId} variant={variant} />
+          <button
+            type="button"
+            onClick={() => onRemove(index)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.preventDefault()}
+            title="Удалить пример"
+            aria-label="Удалить пример"
+            className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-red-600 text-white text-xs leading-none cursor-pointer"
+          >
+            ×
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function UploadExamplesEditor({
   examples,
   gender,
@@ -364,6 +473,8 @@ function UploadExamplesEditor({
   onAddBad,
   onRemoveGood,
   onRemoveBad,
+  onReorderGood,
+  onReorderBad,
   onReset,
 }: {
   examples: UploadExamplesForSlot;
@@ -376,6 +487,8 @@ function UploadExamplesEditor({
   onAddBad: (files: FileList) => void;
   onRemoveGood: (index: number) => void;
   onRemoveBad: (index: number) => void;
+  onReorderGood: (next: string[]) => void;
+  onReorderBad: (next: string[]) => void;
   onReset: () => void;
 }) {
   const goodRef = useRef<HTMLInputElement>(null);
@@ -416,23 +529,17 @@ function UploadExamplesEditor({
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <p className="text-sm font-medium">Хорошие примеры</p>
+          <p className="text-xs text-neutral-500">Перетащите миниатюры, чтобы изменить порядок.</p>
           {examples.good.length === 0 ? (
             <p className="text-xs text-neutral-500">Нет примеров</p>
           ) : (
-            <ul className="flex flex-wrap gap-2">
-              {examples.good.map((refId, index) => (
-                <li key={`${refId}-${index}`} className="relative">
-                  <ExampleThumb refId={refId} variant="good" />
-                  <button
-                    type="button"
-                    onClick={() => onRemoveGood(index)}
-                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-red-600 text-white text-xs leading-none"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <ExampleThumbsReorderList
+              refs={examples.good}
+              variant="good"
+              ariaLabel="Хорошие примеры, перетащите для смены порядка"
+              onReorder={onReorderGood}
+              onRemove={onRemoveGood}
+            />
           )}
           <button
             type="button"
@@ -446,23 +553,17 @@ function UploadExamplesEditor({
 
         <div className="space-y-2">
           <p className="text-sm font-medium">Плохие примеры</p>
+          <p className="text-xs text-neutral-500">Перетащите миниатюры, чтобы изменить порядок.</p>
           {examples.bad.length === 0 ? (
             <p className="text-xs text-neutral-500">Нет примеров</p>
           ) : (
-            <ul className="flex flex-wrap gap-2">
-              {examples.bad.map((refId, index) => (
-                <li key={`${refId}-${index}`} className="relative">
-                  <ExampleThumb refId={refId} variant="bad" />
-                  <button
-                    type="button"
-                    onClick={() => onRemoveBad(index)}
-                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-red-600 text-white text-xs leading-none"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <ExampleThumbsReorderList
+              refs={examples.bad}
+              variant="bad"
+              ariaLabel="Плохие примеры, перетащите для смены порядка"
+              onReorder={onReorderBad}
+              onRemove={onRemoveBad}
+            />
           )}
           <button
             type="button"
@@ -515,8 +616,10 @@ function TileCatalogEditor({
   addLabel,
   emptyHint,
   fileAccept = "image/*",
+  listAriaLabel = "Каталог, перетащите для смены порядка",
   onAdd,
   onLabelChange,
+  onReorder,
   onRemove,
   onResetDefaults,
 }: {
@@ -525,37 +628,65 @@ function TileCatalogEditor({
   addLabel: string;
   emptyHint: string;
   fileAccept?: string;
+  listAriaLabel?: string;
   onAdd: (files: FileList) => void;
   onLabelChange: (index: number, label: string) => void;
+  onReorder: (next: ConfigTile[]) => void;
   onRemove: (index: number) => void;
   onResetDefaults: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const dnd = useListDragReorder();
 
   return (
     <div className="space-y-3">
       {tiles.length === 0 ? (
         <p className="text-sm text-neutral-500">{emptyHint}</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3" aria-label={listAriaLabel}>
           {tiles.map((tile, index) => (
             <li
               key={tile.id}
-              className="flex gap-3 items-start p-3 rounded-lg border border-neutral-200 bg-neutral-50"
+              onDragOver={(e) => dnd.handleDragOver(e, index)}
+              onDrop={(e) =>
+                dnd.handleDrop(e, index, (from, to) => {
+                  const next = moveListItem(tiles, from, to);
+                  if (next) onReorder(next);
+                })
+              }
+              onDragEnd={dnd.handleDragEnd}
+              title="Потяните за ⋮⋮, чтобы изменить порядок"
+              className={`flex gap-3 items-start p-3 rounded-lg border bg-neutral-50 ${dnd.rowClass(index)}`}
             >
-              <TileCatalogThumb image={tile.image} tint={tile.tint} />
+              <span
+                draggable
+                onDragStart={(e) => dnd.handleDragStart(e, index)}
+                className="pt-1"
+              >
+                <DragHandle label="Потяните, чтобы изменить порядок" />
+              </span>
+              <TileCatalogThumb
+                image={tile.image}
+                poster={tile.poster}
+                tint={tile.tint}
+              />
               <div className="flex-1 min-w-0 space-y-2">
                 <input
                   className="w-full border rounded px-2 py-1.5 text-sm"
                   value={tile.label}
                   onChange={(e) => onLabelChange(index, e.target.value)}
+                  title={tile.label}
+                  aria-label={`Название: ${tile.id}`}
                 />
                 <p className="text-xs text-neutral-500 truncate">{tile.id}</p>
               </div>
               <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="shrink-0 text-xs text-red-600"
+                onMouseDown={(e) => e.stopPropagation()}
+                onDragStart={(e) => e.preventDefault()}
+                title={`Удалить «${tile.label}»`}
+                className="shrink-0 text-xs text-red-600 cursor-pointer"
               >
                 Удалить
               </button>
@@ -609,6 +740,10 @@ function AdminPage() {
   /** Перезапуск CSS-анимации логотипа в превью. */
   const [logoPreviewKey, setLogoPreviewKey] = useState(0);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  /** Один live-превью вместо трёх Widget — иначе админка зависает. */
+  const [previewTab, setPreviewTab] = useState<
+    "splash" | "change-background" | "animate-image"
+  >("splash");
   const logoFileRef = useRef<HTMLInputElement>(null);
 
   const light = {
@@ -1121,8 +1256,48 @@ function AdminPage() {
                       className="mt-1 w-full border rounded px-3 py-2 text-sm"
                       value={brand.logoAlt}
                       onChange={(e) => patchBrand({ logoAlt: e.target.value })}
+                      style={
+                        logoIsTextOnly
+                          ? { fontFamily: brand.logoFont }
+                          : undefined
+                      }
                     />
                   </label>
+                  {logoIsTextOnly ? (
+                    <label className="block text-sm">
+                      <span className="font-medium">Шрифт текстового логотипа</span>
+                      <FieldHint>
+                        Только для режима «только текст». На картинку не влияет.
+                      </FieldHint>
+                      <select
+                        className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                        value={matchFontOption(
+                          brand.logoFont || defaultWidgetConfig.brand.logoFont,
+                        ).id}
+                        onChange={(e) => {
+                          const next = FONT_CATALOG.find((f) => f.id === e.target.value);
+                          if (!next) return;
+                          patchBrand({ logoFont: next.value });
+                        }}
+                        style={{
+                          fontFamily:
+                            brand.logoFont || defaultWidgetConfig.brand.logoFont,
+                        }}
+                        title="Шрифт текстового логотипа"
+                        aria-label="Шрифт текстового логотипа"
+                      >
+                        {FONT_CATALOG.map((font) => (
+                          <option
+                            key={font.id}
+                            value={font.id}
+                            style={{ fontFamily: font.value }}
+                          >
+                            {font.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
                   <div className="space-y-2">
                     <span className="font-medium text-sm block">Источник</span>
                     <FieldHint>
@@ -1224,7 +1399,11 @@ function AdminPage() {
                   </label>
                   {brand.logoAnimationEnabled ? (
                     <LogoAnimationPicker
-                      value={brand.logoAnimation}
+                      value={
+                        isLogoAnimationId(brand.logoAnimation)
+                          ? brand.logoAnimation
+                          : "fadeIn"
+                      }
                       invert={brand.logoInvert}
                       onChange={(logoAnimation: LogoAnimationId) => {
                         patchBrand({ logoAnimation });
@@ -1491,13 +1670,14 @@ function AdminPage() {
             <section className="bg-white rounded-xl shadow p-5 space-y-4">
               <SectionIntro
                 title="Телепорт — фоны"
-                description="Каталог фонов на экране «Сменить фон». Загрузите превью (изображение или видео) — файлы сохраняются в браузере."
+                description="Каталог фонов на экране «Сменить фон». Порядок меняется перетаскиванием за ⋮⋮. Файлы сохраняются в браузере."
               />
               <TileCatalogEditor
                 tiles={backgroundTiles}
                 uploading={uploadingBackgrounds}
                 addLabel="Добавить фон"
                 emptyHint="Список фонов пуст. Добавьте файлы или верните набор по умолчанию."
+                listAriaLabel="Фоны телепорта, перетащите для смены порядка"
                 onAdd={(files) => void onBackgroundFiles(files)}
                 onLabelChange={(index, label) => {
                   const next = backgroundTiles.map((tile, i) =>
@@ -1505,6 +1685,7 @@ function AdminPage() {
                   );
                   setBackgroundTiles(next);
                 }}
+                onReorder={setBackgroundTiles}
                 onRemove={(index) => void removeBackgroundTile(index)}
                 onResetDefaults={() => void resetBackgroundTiles()}
               />
@@ -1513,7 +1694,7 @@ function AdminPage() {
             <section className="bg-white rounded-xl shadow p-5 space-y-4">
               <SectionIntro
                 title="Оживить образ — позы и анимации"
-                description="Каталог превью на экране «Оживить образ». Добавляйте картинки или видео-превью анимаций."
+                description="Каталог превью на экране «Оживить образ». Порядок меняется перетаскиванием за ⋮⋮."
               />
               <TileCatalogEditor
                 tiles={poseTiles}
@@ -1521,6 +1702,7 @@ function AdminPage() {
                 addLabel="Добавить позу / анимацию"
                 emptyHint="Список поз пуст. Добавьте файлы или верните набор по умолчанию."
                 fileAccept="image/*,video/*"
+                listAriaLabel="Позы и анимации, перетащите для смены порядка"
                 onAdd={(files) => void onPoseFiles(files)}
                 onLabelChange={(index, label) => {
                   const next = poseTiles.map((tile, i) =>
@@ -1528,6 +1710,7 @@ function AdminPage() {
                   );
                   setPoseTiles(next);
                 }}
+                onReorder={setPoseTiles}
                 onRemove={(index) => void removePoseTile(index)}
                 onResetDefaults={() => void resetPoseTiles()}
               />
@@ -1549,67 +1732,86 @@ function AdminPage() {
                 onAddBad={(files) => void onUploadExampleFiles("bad", files)}
                 onRemoveGood={(index) => void removeUploadExample("good", index)}
                 onRemoveBad={(index) => void removeUploadExample("bad", index)}
+                onReorderGood={(next) =>
+                  patchUploadSlot(uploadExamplesGender, uploadExamplesSlot, (cur) => ({
+                    ...cur,
+                    good: next,
+                  }))
+                }
+                onReorderBad={(next) =>
+                  patchUploadSlot(uploadExamplesGender, uploadExamplesSlot, (cur) => ({
+                    ...cur,
+                    bad: next,
+                  }))
+                }
                 onReset={() => void resetUploadExamples()}
               />
             </section>
           </div>
 
-          <div className="flex flex-col gap-6 xl:sticky xl:top-8 xl:self-start">
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-neutral-500 text-center xl:text-left">
-                {splash.enabled
+          <div className="flex flex-col gap-3 xl:sticky xl:top-8 xl:self-start">
+            <div
+              className="flex flex-wrap gap-1.5 justify-center xl:justify-start"
+              role="tablist"
+              aria-label="Экран предпросмотра"
+            >
+              {(
+                [
+                  {
+                    id: "splash" as const,
+                    label: splash.enabled ? "Заставка" : "Старт",
+                  },
+                  { id: "change-background" as const, label: "Телепорт" },
+                  { id: "animate-image" as const, label: "Позы" },
+                ] as const
+              ).map((tab) => {
+                const active = previewTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    title={tab.label}
+                    onClick={() => setPreviewTab(tab.id)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                      active
+                        ? "bg-neutral-900 text-white border-neutral-900"
+                        : "bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-neutral-500 text-center xl:text-left">
+              {previewTab === "splash"
+                ? splash.enabled
                   ? "Предпросмотр заставки — изменения применяются сразу"
-                  : "Заставка выключена — показывается стартовый экран"}
-              </p>
-              <div className="flex justify-center xl:justify-start">
-                {overridesReady ? (
-                  <Widget
-                    key={`splash-${splash.enabled}-${splashImages.length}-${splashRu.title}`}
-                    initialScreen={splash.enabled ? "splash" : "start-page"}
-                  />
-                ) : (
-                  <div
-                    aria-hidden
-                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
-                  />
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-neutral-500 text-center xl:text-left">
-                Телепорт — каталог фонов
-              </p>
-              <div className="flex justify-center xl:justify-start">
-                {overridesReady ? (
-                  <Widget
-                    key={`bg-${backgroundTiles.length}-${backgroundTiles[0]?.id ?? ""}`}
-                    initialScreen="change-background"
-                  />
-                ) : (
-                  <div
-                    aria-hidden
-                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
-                  />
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <p className="text-xs text-neutral-500 text-center xl:text-left">
-                Оживить образ — каталог поз
-              </p>
-              <div className="flex justify-center xl:justify-start">
-                {overridesReady ? (
-                  <Widget
-                    key={`pose-${poseTiles.length}-${poseTiles[0]?.id ?? ""}`}
-                    initialScreen="animate-image"
-                  />
-                ) : (
-                  <div
-                    aria-hidden
-                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
-                  />
-                )}
-              </div>
+                  : "Заставка выключена — стартовый экран"
+                : previewTab === "change-background"
+                  ? "Телепорт — каталог фонов"
+                  : "Оживить образ — каталог поз"}
+            </p>
+            <div className="flex justify-center xl:justify-start">
+              {overridesReady ? (
+                <Widget
+                  key={previewTab}
+                  initialScreen={
+                    previewTab === "splash"
+                      ? splash.enabled
+                        ? "splash"
+                        : "start-page"
+                      : previewTab
+                  }
+                />
+              ) : (
+                <div
+                  aria-hidden
+                  className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
+                />
+              )}
             </div>
           </div>
         </div>

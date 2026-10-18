@@ -1464,6 +1464,7 @@ export const defaultWidgetConfig: WidgetConfig = {
     logoEnabled: true,
     /** Совпадает с дефолтным SVG (wordmark Lamoda). */
     logoAlt: "lamoda",
+    logoFont: "'Manrope', sans-serif",
     siteUrl: undefined,
     logoUrl: defaultLogoUrl,
     logoAnimationEnabled: true,

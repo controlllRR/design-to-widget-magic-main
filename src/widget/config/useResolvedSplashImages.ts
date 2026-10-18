@@ -16,10 +16,11 @@ export function useResolvedSplashImages(refs: string[]): string[] {
   useEffect(() => {
     let cancelled = false;
     const objectUrls: string[] = [];
+    const snapshot = refs;
 
     async function load() {
       const urls = await Promise.all(
-        refs.map(async (ref) => {
+        snapshot.map(async (ref) => {
           if (!isSplashIdbRef(ref)) return ref;
           const blob = await getSplashSlideBlob(ref);
           if (!blob) return "";
@@ -39,7 +40,8 @@ export function useResolvedSplashImages(refs: string[]): string[] {
       cancelled = true;
       objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [refsKey, refs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refsKey сериализует refs
+  }, [refsKey]);
 
   return resolved;
 }

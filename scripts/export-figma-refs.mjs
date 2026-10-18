@@ -3,7 +3,7 @@
  *
  * Usage:
  *   FIGMA_ACCESS_TOKEN=xxx node scripts/export-figma-refs.mjs
- *   FIGMA_ACCESS_TOKEN=xxx node scripts/export-figma-refs.mjs my-images generation-page-p2-v2
+ *   FIGMA_ACCESS_TOKEN=xxx node scripts/export-figma-refs.mjs my-images generation-page-p2
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -18,13 +18,12 @@ const SCALE = 2;
 /** slug → { nodeId, filename } */
 const EXPORTS = {
   "my-images": { nodeId: "1169:15884", filename: "my-images.png" },
-  "generation-page-p2-v2": { nodeId: "1211:24713", filename: "generation-page-p2-v2.png" },
-  "generation-page-p2": { nodeId: "1211:24201", filename: "generation-page-p2.png" },
+  "generation-page-p2": { nodeId: "1211:24713", filename: "generation-page-p2.png" },
   "create-profile-scroll-params": {
     nodeId: "1211:25283",
     filename: "create-profile-scroll-params.png",
   },
-  "user-menu-v2": { nodeId: "1169:16134", filename: "user-menu-v2.png" },
+  "user-menu": { nodeId: "1169:16134", filename: "user-menu.png" },
   "add-from-store-filter": { nodeId: "1157:14722", filename: "add-from-store-filter.png" },
 };
 

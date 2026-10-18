@@ -107,9 +107,6 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
     useState<WidgetRoute>("generation-page");
   const [appliedWardrobeSet, setAppliedWardrobeSet] = useState<TileItem | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
-  const [generationLoadingVariant, setGenerationLoadingVariant] = useState<
-    "v1" | "v2"
-  >("v1");
   const [addingModelProfile, setAddingModelProfile] = useState(false);
   const [editingProfileIndex, setEditingProfileIndex] = useState<number | null>(null);
   const [overlayRoot, setOverlayRoot] = useState<HTMLDivElement | null>(null);
@@ -122,18 +119,14 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
     }
   }, []);
 
-  const startGenerationLoading = useCallback(
-    (variant: "v1" | "v2" = "v1") => {
-      clearGenerationTimer();
-      setGenerationLoadingVariant(variant);
-      setGenerationLoading(true);
-      generationTimerRef.current = window.setTimeout(() => {
-        setGenerationLoading(false);
-        generationTimerRef.current = null;
-      }, GENERATION_LOADER_MS);
-    },
-    [clearGenerationTimer],
-  );
+  const startGenerationLoading = useCallback(() => {
+    clearGenerationTimer();
+    setGenerationLoading(true);
+    generationTimerRef.current = window.setTimeout(() => {
+      setGenerationLoading(false);
+      generationTimerRef.current = null;
+    }, GENERATION_LOADER_MS);
+  }, [clearGenerationTimer]);
 
   useEffect(() => () => clearGenerationTimer(), [clearGenerationTimer]);
 
@@ -172,12 +165,12 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
 
   const runGeneration = () => {
     navigate("generation-page");
-    startGenerationLoading("v1");
+    startGenerationLoading();
   };
 
   const runAnimate = () => {
     navigate("generation-page");
-    startGenerationLoading("v2");
+    startGenerationLoading();
   };
 
   const generationPageProps = {
@@ -197,8 +190,7 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
     onAnimate: () => navigate("animate-image"),
     onLooksSelect: () => setReplaceOutfitOpen(true),
     isGenerating: generationLoading,
-    generatingVariant: generationLoadingVariant,
-    onTryOn: () => startGenerationLoading("v1"),
+    onTryOn: () => startGenerationLoading(),
     appliedSet: appliedWardrobeSet,
     heroImage,
   };
@@ -272,13 +264,6 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
       )}
       {screen === "user-menu" && (
         <UserMenu
-          onClose={() => navigate("start-page")}
-          onSelect={handleMenuSelect}
-        />
-      )}
-      {screen === "user-menu-v2" && (
-        <UserMenu
-          variant="v2"
           onClose={() => navigate("start-page")}
           onSelect={handleMenuSelect}
         />
@@ -411,21 +396,11 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
           }}
         />
       )}
-      {screen === "preloader-v1" && (
-        <PreloaderPreview
-          variant="v1"
-          onDone={() => navigate("generation-page")}
-        />
-      )}
-      {screen === "preloader-v2" && (
-        <PreloaderPreview
-          variant="v2"
-          onDone={() => navigate("generation-page")}
-        />
+      {screen === "preloader" && (
+        <PreloaderPreview onDone={() => navigate("generation-page")} />
       )}
       {screen === "generation-page" && <GenerationPage {...generationPageProps} />}
       {screen === "generation-page-p2" && <GenerationPage {...generationPageProps} />}
-      {screen === "generation-page-p2-v2" && <GenerationPage {...generationPageProps} />}
       {screen === "generation-item-config" && (
         <GenerationPage {...generationPageProps} initialConfigItemId="3" />
       )}

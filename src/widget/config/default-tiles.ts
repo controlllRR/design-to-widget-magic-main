@@ -4,6 +4,11 @@ import animate2 from "@/assets/animate/tile-2.mp4";
 import animate3 from "@/assets/animate/tile-3.mp4";
 import animate4 from "@/assets/animate/tile-4.mp4";
 import animate5 from "@/assets/animate/tile-5.mp4";
+import animate1Poster from "@/assets/animate/tile-1.png";
+import animate2Poster from "@/assets/animate/tile-2.png";
+import animate3Poster from "@/assets/animate/tile-3.png";
+import animate4Poster from "@/assets/animate/tile-4.png";
+import animate5Poster from "@/assets/animate/tile-5.png";
 import beach from "@/assets/backgrounds/beach.png";
 import cityDusk from "@/assets/backgrounds/city-dusk.png";
 import living from "@/assets/backgrounds/living.png";
@@ -40,16 +45,26 @@ export const defaultBackgroundTiles: ConfigTile[] = [
 ];
 
 export const defaultAnimatePoseTiles: ConfigTile[] = [
-  { id: "pose-v1", label: "позирует v1", image: animate1 },
-  { id: "dance-v1", label: "танец V1", image: animate2 },
-  { id: "dance-v2", label: "танец v2", image: animate3 },
-  { id: "spin", label: "кружится вокруг своей оси", image: animate4 },
-  { id: "pose-v2", label: "позирует v2", image: animate5 },
-  { id: "pose-v3", label: "позирует v3", image: animate3 },
-  { id: "pose-v1b", label: "позирует v1", image: animate1 },
-  { id: "dance-v1b", label: "танец V1", image: animate2 },
-  { id: "dance-v2b", label: "танец v2", image: animate4 },
-  { id: "spin-b", label: "кружится вокруг своей оси", image: animate5 },
-  { id: "pose-v2b", label: "позирует v2", image: animate3 },
-  { id: "dance-3", label: "танец 3", image: animate2 },
+  { id: "pose-v1", label: "позирует v1", image: animate1, poster: animate1Poster },
+  { id: "dance-v1", label: "танец V1", image: animate2, poster: animate2Poster },
+  { id: "dance-v2", label: "танец v2", image: animate3, poster: animate3Poster },
+  {
+    id: "spin",
+    label: "кружится вокруг своей оси",
+    image: animate4,
+    poster: animate4Poster,
+  },
+  { id: "pose-v2", label: "позирует v2", image: animate5, poster: animate5Poster },
+  { id: "pose-v3", label: "позирует v3", image: animate3, poster: animate3Poster },
+  { id: "pose-v1b", label: "позирует v1", image: animate1, poster: animate1Poster },
+  { id: "dance-v1b", label: "танец V1", image: animate2, poster: animate2Poster },
+  { id: "dance-v2b", label: "танец v2", image: animate4, poster: animate4Poster },
+  {
+    id: "spin-b",
+    label: "кружится вокруг своей оси",
+    image: animate5,
+    poster: animate5Poster,
+  },
+  { id: "pose-v2b", label: "позирует v2", image: animate3, poster: animate3Poster },
+  { id: "dance-3", label: "танец 3", image: animate2, poster: animate2Poster },
 ];

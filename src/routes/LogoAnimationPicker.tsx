@@ -16,8 +16,9 @@ interface LogoAnimationPickerProps {
 const GROUP_ORDER: LogoAnimationGroup[] = ["entrance", "loop", "effect"];
 
 /**
- * Сетка превью анимаций логотипа для админки:
- * каждая плитка крутит свой вариант, выбранная подсвечена.
+ * Сетка превью анимаций логотипа для админки.
+ * Анимация крутится только у выбранной / наведённой плитки —
+ * иначе 30+ CSS-анимаций одновременно убивают отзывчивость страницы.
  */
 export function LogoAnimationPicker({
   value,
@@ -25,6 +26,7 @@ export function LogoAnimationPicker({
   invert,
 }: LogoAnimationPickerProps) {
   const [query, setQuery] = useState("");
+  const [hoveredId, setHoveredId] = useState<LogoAnimationId | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -52,7 +54,8 @@ export function LogoAnimationPicker({
       <label className="block text-sm">
         <span className="font-medium">Тип анимации</span>
         <p className="text-xs text-neutral-500 mt-0.5">
-          Выберите плитку — в ней сразу видно, как будет выглядеть эффект.
+          Наведите или выберите плитку — в ней сразу видно эффект. Остальные
+          статичны, чтобы админка не тормозила.
         </p>
         <div className="relative mt-2">
           <input
@@ -93,6 +96,7 @@ export function LogoAnimationPicker({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {list.map((opt) => {
                   const selected = value === opt.id;
+                  const live = selected || hoveredId === opt.id;
                   return (
                     <button
                       key={opt.id}
@@ -101,6 +105,14 @@ export function LogoAnimationPicker({
                       aria-label={`${opt.label}: ${opt.hint}`}
                       aria-pressed={selected}
                       onClick={() => onChange(opt.id)}
+                      onMouseEnter={() => setHoveredId(opt.id)}
+                      onMouseLeave={() =>
+                        setHoveredId((cur) => (cur === opt.id ? null : cur))
+                      }
+                      onFocus={() => setHoveredId(opt.id)}
+                      onBlur={() =>
+                        setHoveredId((cur) => (cur === opt.id ? null : cur))
+                      }
                       className={`text-left rounded-xl border p-2.5 transition-shadow ${
                         selected
                           ? "border-neutral-900 ring-2 ring-neutral-900 bg-neutral-50"
@@ -108,12 +120,14 @@ export function LogoAnimationPicker({
                       }`}
                     >
                       <div
-                        className="vf-logo-preview-loop flex items-center justify-center rounded-lg bg-neutral-900 mb-2 overflow-hidden"
+                        className={`flex items-center justify-center rounded-lg bg-neutral-900 mb-2 overflow-hidden ${
+                          live ? "vf-logo-preview-loop" : ""
+                        }`}
                         style={{ height: 52 }}
                       >
                         <BrandLogo
                           animationOverride={opt.id}
-                          enabledOverride
+                          enabledOverride={live}
                           invertOverride={invert}
                           height="22px"
                           disableLink
