@@ -2,7 +2,7 @@
  * Переопределения виджет-конфига (localStorage).
  * Временная админка прототипа → боевой embed передаёт partial через WidgetConfigProvider.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import type { DeepPartial, WidgetConfig } from "./types";
 
 const STORAGE_KEY = "vf:widget-overrides:v1";
@@ -10,7 +10,7 @@ const EVENT_NAME = "vf:widget-overrides-changed";
 
 export type WidgetOverrides = DeepPartial<WidgetConfig>;
 
-function readOverrides(): WidgetOverrides {
+export function readOverrides(): WidgetOverrides {
   if (typeof window === "undefined") return {};
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -37,8 +37,18 @@ export function useWidgetOverrides(): [
   WidgetOverrides,
   (updater: WidgetOverrides | ((prev: WidgetOverrides) => WidgetOverrides)) => void,
   () => void,
+  /** false до чтения localStorage (SSR / первый кадр) — не монтировать виджет. */
+  boolean,
 ] {
-  const [state, setState] = useState<WidgetOverrides>(() => readOverrides());
+  // На SSR localStorage недоступен → {}. После гидрации читаем overrides,
+  // иначе мелькает дефолтная заставка (splash.enabled=true).
+  const [state, setState] = useState<WidgetOverrides>({});
+  const [hydrated, setHydrated] = useState(false);
+
+  useLayoutEffect(() => {
+    setState(readOverrides());
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,5 +83,5 @@ export function useWidgetOverrides(): [
     setState({});
   }, []);
 
-  return [state, update, reset];
+  return [state, update, reset, hydrated];
 }

@@ -40,9 +40,12 @@ export function BrandLogo({
   const { config } = useWidgetConfig();
   const { brand } = config;
 
-  const rawUrl = brand.logoUrl || defaultLogoUrl;
+  /** Пустая строка = режим «только текст»; undefined не должен сюда попасть из defaults. */
+  const rawUrl = brand.logoUrl ?? "";
+  const useImage = Boolean(rawUrl);
+
   const [resolvedUrl, setResolvedUrl] = useState(() =>
-    isMediaIdbRef(rawUrl) ? "" : rawUrl,
+    useImage && isMediaIdbRef(rawUrl) ? "" : rawUrl,
   );
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -52,6 +55,10 @@ export function BrandLogo({
     setImgFailed(false);
 
     async function load() {
+      if (!useImage) {
+        setResolvedUrl("");
+        return;
+      }
       if (!isMediaIdbRef(rawUrl)) {
         setResolvedUrl(rawUrl);
         return;
@@ -71,13 +78,17 @@ export function BrandLogo({
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [rawUrl]);
+  }, [rawUrl, useImage]);
 
-  const enabled = enabledOverride ?? brand.logoAnimationEnabled;
+  if (!brand.logoEnabled) {
+    return null;
+  }
+
+  const animEnabled = enabledOverride ?? brand.logoAnimationEnabled;
   const animation: LogoAnimationId = animationOverride ?? brand.logoAnimation;
   const invert = invertOverride ?? brand.logoInvert;
 
-  const animClass = enabled ? `vf-logo-anim-${animation}` : "";
+  const animClass = animEnabled ? `vf-logo-anim-${animation}` : "";
 
   const imgStyle: CSSProperties = {
     height,
@@ -96,7 +107,7 @@ export function BrandLogo({
         color: invert ? "#ffffff" : "#111111",
         fontFamily: "var(--vf-font-heading, 'Manrope', sans-serif)",
         fontWeight: 600,
-        letterSpacing: "0.4em",
+        letterSpacing: "0.12em",
       }}
     >
       {brand.logoAlt}
@@ -104,7 +115,7 @@ export function BrandLogo({
   );
 
   const media: ReactNode =
-    resolvedUrl && !imgFailed ? (
+    useImage && resolvedUrl && !imgFailed ? (
       <img
         src={resolvedUrl}
         alt={brand.logoAlt}

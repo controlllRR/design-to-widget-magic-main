@@ -27,6 +27,8 @@ export interface BottomSheetProps {
   footer?: ReactNode;
   scrollBody?: boolean;
   showPoweredBy?: boolean;
+  /** Поверх другого sheet (например подсказка над редактированием). */
+  zIndex?: number;
 }
 
 /** Общий bottom sheet — Figma grabber, radius 24px, тень снизу. */
@@ -41,6 +43,7 @@ export function BottomSheet({
   footer,
   scrollBody = false,
   showPoweredBy = true,
+  zIndex,
 }: BottomSheetProps) {
   useWidgetConfig();
 
@@ -67,6 +70,7 @@ export function BottomSheet({
       open={open}
       onClose={onClose}
       ariaLabel={ariaLabel}
+      zIndex={zIndex}
       panelStyle={{
         backgroundColor: "var(--vf-surface)",
         borderTopLeftRadius: "var(--vf-radius-widget)",

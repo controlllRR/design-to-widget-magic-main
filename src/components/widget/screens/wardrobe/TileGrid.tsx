@@ -324,7 +324,8 @@ export function TileCard({
                 color: "#343537",
               }
             : {
-                marginTop: 6,
+                marginTop: 8,
+                minHeight: 28,
                 fontSize: 10,
                 color: "var(--vf-text)",
               }
@@ -452,9 +453,9 @@ export function TileGrid({
     <div
       className="grid pb-4"
       style={{
-        gap: isWardrobe ? undefined : "var(--vf-sp-12)",
-        columnGap: isWardrobe ? 12 : undefined,
-        rowGap: isWardrobe ? 22 : undefined,
+        // Явные px: var(--vf-sp-*) на cqw иногда схлопывался → карточки без зазоров.
+        columnGap: isWardrobe ? 12 : 12,
+        rowGap: isWardrobe ? 22 : 16,
         paddingInline: 12,
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
       }}

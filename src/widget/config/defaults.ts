@@ -372,6 +372,14 @@ export const defaultWidgetConfig: WidgetConfig = {
           photoTips: "как выбрать фото?",
           uploadExtra: "загрузить дополнительное фото",
           deleteItem: "удалить вещь",
+          areaLabel: "область применения",
+          areaSearch: "найти область",
+          areas: {
+            torso: "торс",
+            legs: "ноги",
+            head: "голова",
+            hands: "руки",
+          },
         },
         store: {
           title: "добавить из магазина",
@@ -515,6 +523,14 @@ export const defaultWidgetConfig: WidgetConfig = {
           namePlaceholder: "укажите название",
           uploadPhoto: "загрузить фото",
           photoTips: "как выбрать фото?",
+          photoTipsTitle: "Как выбрать фото вещи",
+          photoTipsItems: [
+            "Снимайте на ровном светлом фоне. Без теней, посторонних предметов и людей в кадре.",
+            "Вещь целиком в кадре. Не обрезайте края одежды — сервис должен видеть силуэт полностью.",
+            "Ровный ракурс сверху или спереди. Избегайте сильных перспективных искажений.",
+            "Хороший свет. Цвет и фактура ткани должны читаться без бликов и пересветов.",
+            "Одна вещь на фото. Не кладите несколько предметов рядом.",
+          ],
           add: "добавить",
         },
         background: {
@@ -1048,6 +1064,14 @@ export const defaultWidgetConfig: WidgetConfig = {
           photoTips: "how to choose a photo?",
           uploadExtra: "upload additional photo",
           deleteItem: "delete item",
+          areaLabel: "application area",
+          areaSearch: "find area",
+          areas: {
+            torso: "torso",
+            legs: "legs",
+            head: "head",
+            hands: "hands",
+          },
         },
         store: {
           title: "add from store",
@@ -1191,6 +1215,14 @@ export const defaultWidgetConfig: WidgetConfig = {
           namePlaceholder: "specify name",
           uploadPhoto: "upload photo",
           photoTips: "how to choose a photo?",
+          photoTipsTitle: "How to choose an item photo",
+          photoTipsItems: [
+            "Shoot on a flat light background. No shadows, clutter, or other people in frame.",
+            "Show the whole item. Don't crop edges — the service needs the full silhouette.",
+            "Keep a straight top-down or front angle. Avoid strong perspective distortion.",
+            "Use good lighting. Fabric color and texture should be clear, without glare.",
+            "One item per photo. Don't place several pieces side by side.",
+          ],
           add: "add",
         },
         background: {
@@ -1429,7 +1461,9 @@ export const defaultWidgetConfig: WidgetConfig = {
     },
   },
   brand: {
-    logoAlt: "TUMBASNCOD",
+    logoEnabled: true,
+    /** Совпадает с дефолтным SVG (wordmark Lamoda). */
+    logoAlt: "lamoda",
     siteUrl: undefined,
     logoUrl: defaultLogoUrl,
     logoAnimationEnabled: true,

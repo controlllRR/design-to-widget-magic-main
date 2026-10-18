@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
+import { backgroundsWithPreview } from "@/widget/config/default-tiles";
 import { useResolvedConfigTiles } from "@/widget/config/useResolvedTiles";
 import { WidgetHeader } from "@/components/widget/WidgetHeader";
 import { Watermark } from "@/components/widget/Watermark";
@@ -31,7 +32,9 @@ export function ChangeBackground({
 }: ChangeBackgroundProps) {
   const { t, config } = useWidgetConfig();
   const s = t.screens;
-  const catalogTiles = useResolvedConfigTiles(config.teleport.backgrounds).map((tile) => ({
+  const catalogTiles = useResolvedConfigTiles(
+    backgroundsWithPreview(config.teleport.backgrounds),
+  ).map((tile) => ({
     ...tile,
     label: s.background.tiles[tile.id] ?? tile.label,
   }));

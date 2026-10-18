@@ -2,6 +2,7 @@ import { Camera, ChevronDown, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useWidgetConfig } from "@/widget/config";
 import { BottomSheet } from "@/components/widget/ui/BottomSheet";
+import { ItemPhotoTipsSheet } from "@/components/widget/ui/ItemPhotoTipsSheet";
 import { primaryButtonStyle } from "@/components/widget/ui/screenShell";
 
 export interface AddSetSheetProps {
@@ -17,12 +18,14 @@ export function AddSetSheet({ open, onClose, onSubmit }: AddSetSheetProps) {
   const sheet = t.screens.addSheet;
   const [name, setName] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  const [tipsOpen, setTipsOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) return;
     setName("");
     setPreview(null);
+    setTipsOpen(false);
   }, [open]);
 
   const handleFile = (file: File | undefined) => {
@@ -35,6 +38,7 @@ export function AddSetSheet({ open, onClose, onSubmit }: AddSetSheetProps) {
   const canSubmit = Boolean(preview);
 
   return (
+    <>
     <BottomSheet
       open={open}
       onClose={onClose}
@@ -134,8 +138,10 @@ export function AddSetSheet({ open, onClose, onSubmit }: AddSetSheetProps) {
               </button>
               <button
                 type="button"
+                onClick={() => setTipsOpen(true)}
                 className="mt-1 block lowercase underline underline-offset-2 decoration-dotted"
                 style={{ fontSize: "var(--vf-fs-12)", color: "var(--vf-text-muted)" }}
+                title={sheet.photoTips}
               >
                 {sheet.photoTips}
               </button>
@@ -163,5 +169,7 @@ export function AddSetSheet({ open, onClose, onSubmit }: AddSetSheetProps) {
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
     </BottomSheet>
+    <ItemPhotoTipsSheet open={tipsOpen} onClose={() => setTipsOpen(false)} />
+    </>
   );
 }

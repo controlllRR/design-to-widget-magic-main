@@ -69,16 +69,49 @@ export interface WidgetTheme {
 export type LogoAnimationId =
   | "fadeIn"
   | "slideDown"
+  | "slideUp"
+  | "slideLeft"
+  | "slideRight"
   | "scaleIn"
+  | "pop"
+  | "rotateIn"
+  | "flipX"
+  | "flipY"
+  | "blurIn"
+  | "bounceIn"
+  | "dropIn"
+  | "expandX"
+  | "skewIn"
   | "float"
-  | "shimmer"
   | "pulse"
-  | "rotateIn";
+  | "breathe"
+  | "bounce"
+  | "wiggle"
+  | "swing"
+  | "sway"
+  | "nod"
+  | "heartbeat"
+  | "jelly"
+  | "spinSlow"
+  | "shimmer"
+  | "glow"
+  | "glitch"
+  | "neon"
+  | "zoomPulse";
 
 export interface BrandConfig {
-  /** URL логотипа сайта (PNG/JPG/SVG). Если не задан — рендерим текст logoAlt. */
+  /** Показывать ли логотип на splash и в шапке. */
+  logoEnabled: boolean;
+  /**
+   * URL картинки логотипа (PNG/JPG/SVG).
+   * Пустая строка — показывать текст logoAlt вместо картинки.
+   * Не задан в overrides — берётся дефолтный SVG из конфига.
+   */
   logoUrl?: string;
-  /** Текст-заглушка логотипа (например, название бренда). */
+  /**
+   * Текст бренда: alt у картинки и видимая надпись, если logoUrl пустой
+   * или картинка не загрузилась.
+   */
   logoAlt: string;
   /** Внешняя ссылка с логотипа (на главную сайта-хоста). */
   siteUrl?: string;
@@ -525,6 +558,14 @@ export interface I18nDictionary {
       photoTips: string;
       uploadExtra: string;
       deleteItem: string;
+      areaLabel: string;
+      areaSearch: string;
+      areas: {
+        torso: string;
+        legs: string;
+        head: string;
+        hands: string;
+      };
     };
     store: {
       title: string;
@@ -643,6 +684,10 @@ export interface I18nDictionary {
       namePlaceholder: string;
       uploadPhoto: string;
       photoTips: string;
+      /** Заголовок sheet «как выбрать фото?» для вещей / наборов. */
+      photoTipsTitle: string;
+      /** Пункты подсказки — правятся в админке (i18n). */
+      photoTipsItems: string[];
       add: string;
     };
     background: {

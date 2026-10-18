@@ -1,5 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { GripVertical } from "lucide-react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+  type ReactNode,
+} from "react";
 import {
   defaultWidgetConfig,
   useWidgetOverrides,
@@ -7,6 +15,7 @@ import {
   type WidgetColors,
   type WidgetOverrides,
 } from "@/widget/config";
+import { backgroundsWithPreview } from "@/widget/config/default-tiles";
 import {
   deleteMediaRef,
   deleteSplashSlide,
@@ -36,20 +45,11 @@ import { BrandLogo } from "@/components/widget/BrandLogo";
 import Widget from "@/components/widget/Widget";
 import { FONT_CATALOG, matchFontOption } from "@/widget/config/fontCatalog";
 import { AdminI18nEditor } from "@/routes/adminI18nEditor";
+import { LogoAnimationPicker } from "@/routes/LogoAnimationPicker";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
-
-const LOGO_ANIMATION_OPTIONS: Array<{ id: LogoAnimationId; label: string }> = [
-  { id: "fadeIn", label: "Появление (fade)" },
-  { id: "slideDown", label: "Съезд сверху" },
-  { id: "scaleIn", label: "Масштаб" },
-  { id: "rotateIn", label: "Поворот" },
-  { id: "float", label: "Парение (цикл)" },
-  { id: "pulse", label: "Пульс (цикл)" },
-  { id: "shimmer", label: "Блик (цикл)" },
-];
 
 const COLOR_FIELDS: Array<{
   key: keyof WidgetColors;
@@ -207,6 +207,103 @@ function SplashSlideThumb({ refId }: { refId: string }) {
         <div className="w-full h-full bg-neutral-200 animate-pulse" />
       )}
     </div>
+  );
+}
+
+/** Список слайдов splash с HTML5 drag-and-drop для смены порядка. */
+function SplashSlidesList({
+  images,
+  onReorder,
+  onRemove,
+}: {
+  images: string[];
+  onReorder: (next: string[]) => void;
+  onRemove: (index: number) => void;
+}) {
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: DragEvent, index: number) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+  };
+
+  const handleDragOver = (e: DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (overIndex !== index) setOverIndex(index);
+  };
+
+  const handleDrop = (e: DragEvent, toIndex: number) => {
+    e.preventDefault();
+    const fromRaw = e.dataTransfer.getData("text/plain");
+    const fromIndex = fromRaw ? Number(fromRaw) : dragIndex;
+    setDragIndex(null);
+    setOverIndex(null);
+    if (fromIndex === null || Number.isNaN(fromIndex) || fromIndex === toIndex) return;
+    const next = [...images];
+    const [moved] = next.splice(fromIndex, 1);
+    if (!moved) return;
+    next.splice(toIndex, 0, moved);
+    onReorder(next);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setOverIndex(null);
+  };
+
+  return (
+    <ul className="space-y-3" aria-label="Слайды заставки, перетащите для смены порядка">
+      {images.map((refId, index) => {
+        const isDragging = dragIndex === index;
+        const isOver = overIndex === index && dragIndex !== null && dragIndex !== index;
+        return (
+          <li
+            key={`${refId}-${index}`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            title="Перетащите, чтобы изменить порядок слайда"
+            className={`flex gap-2 items-center p-3 rounded-lg border bg-neutral-50 cursor-grab active:cursor-grabbing select-none transition-colors ${
+              isDragging
+                ? "opacity-50 border-neutral-400"
+                : isOver
+                  ? "border-neutral-900 ring-2 ring-neutral-900/20"
+                  : "border-neutral-200"
+            }`}
+          >
+            <span
+              className="shrink-0 text-neutral-400"
+              aria-hidden
+              title="Потяните за строку"
+            >
+              <GripVertical size={18} strokeWidth={1.75} />
+            </span>
+            <SplashSlideThumb refId={refId} />
+            <span className="flex-1 text-sm text-neutral-700">Слайд {index + 1}</span>
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              onMouseDown={(e) => e.stopPropagation()}
+              onDragStart={(e) => e.preventDefault()}
+              disabled={images.length <= 1}
+              title={
+                images.length <= 1
+                  ? "Нужен хотя бы один слайд"
+                  : `Удалить слайд ${index + 1}`
+              }
+              className="shrink-0 text-xs text-red-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Удалить
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -499,7 +596,8 @@ function TileCatalogEditor({
 }
 
 function AdminPage() {
-  const [overrides, setOverrides, resetOverrides] = useWidgetOverrides();
+  const [overrides, setOverrides, resetOverrides, overridesReady] =
+    useWidgetOverrides();
   const [uploadingSlides, setUploadingSlides] = useState(false);
   const [uploadingBackgrounds, setUploadingBackgrounds] = useState(false);
   const [uploadingPoses, setUploadingPoses] = useState(false);
@@ -548,8 +646,10 @@ function AdminPage() {
 
   const splashImages = splash.images;
 
-  const backgroundTiles =
-    overrides.teleport?.backgrounds ?? defaultWidgetConfig.teleport.backgrounds;
+  const backgroundTiles = backgroundsWithPreview(
+    (overrides.teleport?.backgrounds as ConfigTile[] | undefined) ??
+      defaultWidgetConfig.teleport.backgrounds,
+  );
   const poseTiles = overrides.animateLook?.poses ?? defaultWidgetConfig.animateLook.poses;
   const uploadExamples =
     overrides.createProfile?.uploadExamples ?? defaultWidgetConfig.createProfile.uploadExamples;
@@ -785,6 +885,12 @@ function AdminPage() {
     }
   };
 
+  /**
+   * nextUrl:
+   * - undefined → сброс к дефолтной картинке (удаляем override);
+   * - "" → режим «только текст logoAlt»;
+   * - иначе → файл/URL.
+   */
   const setBrandLogoUrl = async (nextUrl: string | undefined) => {
     const prevUrl = overrides.brand?.logoUrl ?? defaultWidgetConfig.brand.logoUrl;
     if (prevUrl && isMediaIdbRef(prevUrl) && prevUrl !== nextUrl) {
@@ -792,7 +898,7 @@ function AdminPage() {
     }
     patch((prev) => {
       const nextBrand = { ...prev.brand };
-      if (!nextUrl) {
+      if (nextUrl === undefined) {
         delete nextBrand.logoUrl;
       } else {
         nextBrand.logoUrl = nextUrl;
@@ -808,6 +914,10 @@ function AdminPage() {
       brand: { ...prev.brand, ...partial },
     }));
   };
+
+  const logoIsTextOnly = brand.logoUrl === "";
+  const logoIsCustomImage =
+    Boolean(brand.logoUrl) && brand.logoUrl !== defaultLogoUrl;
 
   const onLogoFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -980,132 +1090,156 @@ function AdminPage() {
             <section className="bg-white rounded-xl shadow p-5 space-y-4">
               <SectionIntro
                 title="Логотип"
-                description="Брендинг сайта-хоста: логотип в шапке и на splash-экране."
+                description="Брендинг сайта-хоста: логотип на splash и в шапке. По умолчанию — картинка Lamoda, не поле «текст»."
               />
-              <label className="block text-sm">
-                <span className="font-medium">Текст логотипа (alt)</span>
-                <FieldHint>
-                  Подпись для доступности и запасной текст, если картинка логотипа не задана.
-                </FieldHint>
-                <input
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                  value={brand.logoAlt}
-                  onChange={(e) => patchBrand({ logoAlt: e.target.value })}
-                />
-              </label>
-              <div className="space-y-2">
-                <span className="font-medium text-sm block">Логотип</span>
-                <FieldHint>
-                  Выберите SVG / PNG / JPG с компьютера. Файл сохраняется в браузере.
-                </FieldHint>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  <button
-                    type="button"
-                    disabled={uploadingLogo}
-                    onClick={() => logoFileRef.current?.click()}
-                    className="text-xs px-3 py-1.5 rounded-full bg-neutral-900 text-white disabled:opacity-60"
-                  >
-                    {uploadingLogo ? "Загрузка…" : "Выбрать файл"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={
-                      uploadingLogo ||
-                      !overrides.brand?.logoUrl ||
-                      overrides.brand.logoUrl === defaultLogoUrl
-                    }
-                    onClick={() => void setBrandLogoUrl(undefined)}
-                    className="text-xs px-3 py-1.5 rounded-full bg-white border border-neutral-300 disabled:opacity-60"
-                  >
-                    Сбросить к дефолту
-                  </button>
-                </div>
-                <input
-                  ref={logoFileRef}
-                  type="file"
-                  accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif"
-                  className="hidden"
-                  onChange={(e) => void onLogoFile(e)}
-                />
-                <label className="block text-sm pt-1">
-                  <span className="font-medium">Или URL</span>
-                  <FieldHint>Опционально — ссылка вместо файла.</FieldHint>
-                  <input
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                    value={
-                      brand.logoUrl &&
-                      !isMediaIdbRef(brand.logoUrl) &&
-                      brand.logoUrl !== defaultLogoUrl
-                        ? brand.logoUrl
-                        : ""
-                    }
-                    placeholder="https://…"
-                    onChange={(e) => {
-                      const next = e.target.value.trim();
-                      void setBrandLogoUrl(next || undefined);
-                    }}
-                  />
-                </label>
-              </div>
               <label className="flex items-start gap-2 text-sm">
                 <input
                   type="checkbox"
                   className="mt-1"
-                  checked={brand.logoAnimationEnabled}
+                  checked={brand.logoEnabled}
                   onChange={(e) => {
-                    const enabled = e.target.checked;
-                    patchBrand({ logoAnimationEnabled: enabled });
-                    if (enabled) setLogoPreviewKey((k) => k + 1);
+                    patchBrand({ logoEnabled: e.target.checked });
+                    setLogoPreviewKey((k) => k + 1);
                   }}
                 />
                 <span>
-                  <span className="font-medium block">Анимация логотипа</span>
-                  <FieldHint>Включить анимацию появления логотипа в шапке.</FieldHint>
+                  <span className="font-medium block">Показывать логотип</span>
+                  <FieldHint>
+                    Выключите, чтобы полностью скрыть логотип на заставке и в шапке.
+                  </FieldHint>
                 </span>
               </label>
-              {brand.logoAnimationEnabled ? (
-                <label className="block text-sm">
-                  <span className="font-medium">Тип анимации</span>
-                  <FieldHint>
-                    Одноразовые — при появлении экрана; циклические — крутятся постоянно.
-                  </FieldHint>
-                  <select
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-                    value={brand.logoAnimation}
-                    onChange={(e) => {
-                      const logoAnimation = e.target.value as LogoAnimationId;
-                      patchBrand({ logoAnimation });
-                      setLogoPreviewKey((k) => k + 1);
-                    }}
-                  >
-                    {LOGO_ANIMATION_OPTIONS.map((opt) => (
-                      <option key={opt.id} value={opt.id}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+              {brand.logoEnabled ? (
+                <>
+                  <label className="block text-sm">
+                    <span className="font-medium">Текст логотипа</span>
+                    <FieldHint>
+                      Виден, если выбран режим «только текст» или картинка не загрузилась.
+                      Не заменяет картинку Lamoda сама по себе.
+                    </FieldHint>
+                    <input
+                      className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                      value={brand.logoAlt}
+                      onChange={(e) => patchBrand({ logoAlt: e.target.value })}
+                    />
+                  </label>
+                  <div className="space-y-2">
+                    <span className="font-medium text-sm block">Источник</span>
+                    <FieldHint>
+                      Сейчас:{" "}
+                      {logoIsTextOnly
+                        ? "текст"
+                        : logoIsCustomImage
+                          ? "своя картинка"
+                          : "картинка по умолчанию (Lamoda)"}
+                      .
+                    </FieldHint>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <button
+                        type="button"
+                        disabled={uploadingLogo}
+                        onClick={() => logoFileRef.current?.click()}
+                        className="text-xs px-3 py-1.5 rounded-full bg-neutral-900 text-white disabled:opacity-60"
+                      >
+                        {uploadingLogo ? "Загрузка…" : "Выбрать файл"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={uploadingLogo || logoIsTextOnly}
+                        onClick={() => void setBrandLogoUrl("")}
+                        className="text-xs px-3 py-1.5 rounded-full bg-white border border-neutral-300 disabled:opacity-60"
+                      >
+                        Только текст
+                      </button>
+                      <button
+                        type="button"
+                        disabled={
+                          uploadingLogo ||
+                          (!logoIsCustomImage && !logoIsTextOnly)
+                        }
+                        onClick={() => void setBrandLogoUrl(undefined)}
+                        className="text-xs px-3 py-1.5 rounded-full bg-white border border-neutral-300 disabled:opacity-60"
+                      >
+                        Сбросить к дефолту
+                      </button>
+                    </div>
+                    <input
+                      ref={logoFileRef}
+                      type="file"
+                      accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif"
+                      className="hidden"
+                      onChange={(e) => void onLogoFile(e)}
+                    />
+                    <label className="block text-sm pt-1">
+                      <span className="font-medium">Или URL</span>
+                      <FieldHint>Опционально — ссылка вместо файла.</FieldHint>
+                      <input
+                        className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                        value={
+                          brand.logoUrl &&
+                          !isMediaIdbRef(brand.logoUrl) &&
+                          brand.logoUrl !== defaultLogoUrl
+                            ? brand.logoUrl
+                            : ""
+                        }
+                        placeholder="https://…"
+                        onChange={(e) => {
+                          const next = e.target.value.trim();
+                          void setBrandLogoUrl(next || undefined);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={brand.logoInvert}
+                      onChange={(e) => patchBrand({ logoInvert: e.target.checked })}
+                    />
+                    <span>
+                      <span className="font-medium block">Белый логотип</span>
+                      <FieldHint>
+                        Инверсия в белый для тёмного фона шапки и splash.
+                      </FieldHint>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={brand.logoAnimationEnabled}
+                      onChange={(e) => {
+                        const enabled = e.target.checked;
+                        patchBrand({ logoAnimationEnabled: enabled });
+                        if (enabled) setLogoPreviewKey((k) => k + 1);
+                      }}
+                    />
+                    <span>
+                      <span className="font-medium block">Анимация логотипа</span>
+                      <FieldHint>
+                        Появление — один раз при загрузке экрана; цикл и эффект — постоянно.
+                      </FieldHint>
+                    </span>
+                  </label>
+                  {brand.logoAnimationEnabled ? (
+                    <LogoAnimationPicker
+                      value={brand.logoAnimation}
+                      invert={brand.logoInvert}
+                      onChange={(logoAnimation: LogoAnimationId) => {
+                        patchBrand({ logoAnimation });
+                        setLogoPreviewKey((k) => k + 1);
+                      }}
+                    />
+                  ) : null}
+                </>
               ) : null}
-              <label className="flex items-start gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  className="mt-1"
-                  checked={brand.logoInvert}
-                  onChange={(e) => patchBrand({ logoInvert: e.target.checked })}
-                />
-                <span>
-                  <span className="font-medium block">Белый логотип</span>
-                  <FieldHint>
-                    Инверсия в белый для тёмного фона шапки и splash (как в превью ниже).
-                  </FieldHint>
-                </span>
-              </label>
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <p className="text-xs text-neutral-500">
                     Предпросмотр логотипа на тёмном фоне
                   </p>
-                  {brand.logoAnimationEnabled ? (
+                  {brand.logoEnabled && brand.logoAnimationEnabled ? (
                     <button
                       type="button"
                       className="text-xs px-2.5 py-1 rounded-full border border-neutral-300 bg-white"
@@ -1116,15 +1250,19 @@ function AdminPage() {
                   ) : null}
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-neutral-900 rounded-lg min-h-[56px] overflow-visible">
-                  <BrandLogo
-                    key={logoPreviewKey}
-                    animationKey={logoPreviewKey}
-                    animationOverride={brand.logoAnimation}
-                    enabledOverride={brand.logoAnimationEnabled}
-                    invertOverride={brand.logoInvert}
-                    height="28px"
-                    disableLink
-                  />
+                  {brand.logoEnabled ? (
+                    <BrandLogo
+                      key={logoPreviewKey}
+                      animationKey={logoPreviewKey}
+                      animationOverride={brand.logoAnimation}
+                      enabledOverride={brand.logoAnimationEnabled}
+                      invertOverride={brand.logoInvert}
+                      height="28px"
+                      disableLink
+                    />
+                  ) : (
+                    <span className="text-xs text-neutral-500">Логотип скрыт</span>
+                  )}
                 </div>
               </div>
             </section>
@@ -1303,28 +1441,14 @@ function AdminPage() {
               <div className="space-y-3 pt-1 border-t border-neutral-100">
                 <p className="text-sm font-medium">Слайды hero-карусели</p>
                 <FieldHint>
-                  Загрузите фото с компьютера — они сохраняются в браузере (IndexedDB) и
-                  подхватываются виджетом и галереей.
+                  Загрузите фото с компьютера — они сохраняются в браузере (IndexedDB).
+                  Перетащите строки, чтобы изменить порядок в карусели.
                 </FieldHint>
-                <ul className="space-y-3">
-                  {splashImages.map((refId, index) => (
-                    <li
-                      key={refId}
-                      className="flex gap-3 items-center p-3 rounded-lg border border-neutral-200 bg-neutral-50"
-                    >
-                      <SplashSlideThumb refId={refId} />
-                      <span className="flex-1 text-sm text-neutral-700">Слайд {index + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => void removeSplashImage(index)}
-                        disabled={splashImages.length <= 1}
-                        className="shrink-0 text-xs text-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        Удалить
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                <SplashSlidesList
+                  images={splashImages}
+                  onReorder={setSplashImages}
+                  onRemove={(index) => void removeSplashImage(index)}
+                />
                 <button
                   type="button"
                   disabled={uploadingSlides}
@@ -1433,10 +1557,22 @@ function AdminPage() {
           <div className="flex flex-col gap-6 xl:sticky xl:top-8 xl:self-start">
             <div className="flex flex-col gap-2">
               <p className="text-xs text-neutral-500 text-center xl:text-left">
-                Предпросмотр заставки — изменения применяются сразу
+                {splash.enabled
+                  ? "Предпросмотр заставки — изменения применяются сразу"
+                  : "Заставка выключена — показывается стартовый экран"}
               </p>
               <div className="flex justify-center xl:justify-start">
-                <Widget key={`splash-${splashImages.length}-${splashRu.title}`} initialScreen="splash" />
+                {overridesReady ? (
+                  <Widget
+                    key={`splash-${splash.enabled}-${splashImages.length}-${splashRu.title}`}
+                    initialScreen={splash.enabled ? "splash" : "start-page"}
+                  />
+                ) : (
+                  <div
+                    aria-hidden
+                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
+                  />
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -1444,10 +1580,17 @@ function AdminPage() {
                 Телепорт — каталог фонов
               </p>
               <div className="flex justify-center xl:justify-start">
-                <Widget
-                  key={`bg-${backgroundTiles.length}-${backgroundTiles[0]?.id ?? ""}`}
-                  initialScreen="change-background"
-                />
+                {overridesReady ? (
+                  <Widget
+                    key={`bg-${backgroundTiles.length}-${backgroundTiles[0]?.id ?? ""}`}
+                    initialScreen="change-background"
+                  />
+                ) : (
+                  <div
+                    aria-hidden
+                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
+                  />
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -1455,10 +1598,17 @@ function AdminPage() {
                 Оживить образ — каталог поз
               </p>
               <div className="flex justify-center xl:justify-start">
-                <Widget
-                  key={`pose-${poseTiles.length}-${poseTiles[0]?.id ?? ""}`}
-                  initialScreen="animate-image"
-                />
+                {overridesReady ? (
+                  <Widget
+                    key={`pose-${poseTiles.length}-${poseTiles[0]?.id ?? ""}`}
+                    initialScreen="animate-image"
+                  />
+                ) : (
+                  <div
+                    aria-hidden
+                    className="w-[375px] h-[812px] rounded-[36px] bg-neutral-100"
+                  />
+                )}
               </div>
             </div>
           </div>

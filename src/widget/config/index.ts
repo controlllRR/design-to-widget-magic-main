@@ -2,6 +2,13 @@ export { WidgetConfigProvider, useWidgetConfig, useWidgetCssVars } from "./Widge
 export { defaultWidgetConfig } from "./defaults";
 export { useWidgetOverrides } from "./overrides";
 export type { WidgetOverrides } from "./overrides";
+export {
+  LOGO_ANIMATION_OPTIONS,
+  LOGO_ANIMATION_GROUP_LABELS,
+  LOGO_ANIMATION_IDS,
+  isLogoAnimationId,
+} from "./logoAnimations";
+export type { LogoAnimationOption, LogoAnimationGroup } from "./logoAnimations";
 export type {
   WidgetConfig,
   WidgetTheme,

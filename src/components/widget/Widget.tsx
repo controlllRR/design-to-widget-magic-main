@@ -1,9 +1,25 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useWidgetConfig, useWidgetCssVars } from "@/widget/config";
 import type { UserMenuItemId } from "@/widget/config";
 import { UserMenuNavProvider } from "@/widget/user-menu/UserMenuNavContext";
 import { UserMenuPinsProvider } from "@/widget/user-menu/useUserMenuPins";
 import type { WidgetRoute } from "@/widget/navigation";
+
+function isSplashRoute(route: WidgetRoute): boolean {
+  return (
+    route === "splash" ||
+    route === "splash-slide-2" ||
+    route === "splash-slide-3"
+  );
+}
+
+function resolveBootScreen(
+  splashEnabled: boolean,
+  initialScreen?: WidgetRoute,
+): WidgetRoute {
+  if (initialScreen) return initialScreen;
+  return splashEnabled ? "splash" : "start-page";
+}
 import { SplashScreen } from "./SplashScreen";
 import { StartPage } from "./screens/StartPage";
 import { StartPageAlt } from "./screens/StartPageAlt";
@@ -65,9 +81,21 @@ function WidgetRoot({ initialScreen }: WidgetProps = {}) {
   const { saveProfile, updateProfile, heroImage, resetModelHero, profiles, setActiveProfileIndex } =
     useWidgetProfile();
 
-  const [screen, setScreen] = useState<WidgetRoute>(
-    initialScreen ?? (config.splash.enabled ? "splash" : "start-page"),
+  const [screen, setScreen] = useState<WidgetRoute>(() =>
+    resolveBootScreen(config.splash.enabled, initialScreen),
   );
+
+  /**
+   * Если заставка выключена в конфиге — не держим splash-экран
+   * (после гидрации overrides / смены настройки в админке).
+   * Явный initialScreen из gallery оставляем как есть.
+   */
+  useLayoutEffect(() => {
+    if (initialScreen) return;
+    if (!config.splash.enabled && isSplashRoute(screen)) {
+      setScreen("start-page");
+    }
+  }, [config.splash.enabled, initialScreen, screen]);
   const [warningOpen, setWarningOpen] = useState(false);
   const [replaceOutfitOpen, setReplaceOutfitOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);

@@ -9,13 +9,16 @@ export const Route = createFileRoute("/")({
 const devLinkClass =
   "text-xs px-3 py-1.5 rounded-full bg-white/90 text-neutral-700 shadow hover:bg-white pointer-events-auto";
 
-/** Виджет VirtuFit — 19 экранов MVP. */
+/**
+ * Виджет VirtuFit.
+ * Ждём hydrated overrides из localStorage — иначе SSR отдаёт splash.enabled=true
+ * и заставка мелькает при обновлении, даже если в админке выключена.
+ */
 function Index() {
-  const [overrides] = useWidgetOverrides();
+  const [overrides, , , hydrated] = useWidgetOverrides();
 
   return (
     <div className="h-[100dvh] w-full flex flex-col overflow-hidden bg-[#e9e9ea] sm:items-center sm:justify-center sm:py-10 relative">
-      {/* Dev-ссылки сверху на мобиле — не перекрывают футер виджета */}
       <div className="sm:hidden shrink-0 flex justify-between items-center px-3 pb-2 vf-pt-safe z-50">
         <Link to="/gallery" className={devLinkClass}>
           Экраны
@@ -26,10 +29,16 @@ function Index() {
       </div>
 
       <WidgetConfigProvider config={overrides}>
-        <Widget />
+        {hydrated ? (
+          <Widget />
+        ) : (
+          <div
+            aria-hidden
+            className="relative flex flex-col overflow-hidden w-full flex-1 min-h-0 sm:flex-none sm:w-[375px] sm:h-[812px] sm:rounded-[36px] bg-white"
+          />
+        )}
       </WidgetConfigProvider>
 
-      {/* Dev-ссылки снизу только на desktop-превью */}
       <Link
         to="/admin"
         className={`hidden sm:inline-flex fixed right-3 z-50 ${devLinkClass}`}

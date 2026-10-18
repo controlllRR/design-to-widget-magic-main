@@ -16,6 +16,15 @@ import studioGray from "@/assets/backgrounds/studio-gray.png";
 import studioPhoto from "@/assets/backgrounds/studio-photo.png";
 import studioWarm from "@/assets/backgrounds/studio-warm.png";
 
+/** Убирает плейсхолдеры без картинки (tint-only) — выглядят как пустые фотки. */
+export function backgroundsWithPreview(tiles: ConfigTile[]): ConfigTile[] {
+  return tiles.filter((tile) => Boolean(tile.image?.trim()));
+}
+
+/**
+ * Каталог фонов телепорта — только тайлы с реальным превью.
+ * Плейсхолдеры только с tint (музей, зал…) убраны: в UI выглядели как «пустые фотки».
+ */
 export const defaultBackgroundTiles: ConfigTile[] = [
   { id: "studio-photo", label: "фотостудия", image: studioPhoto },
   { id: "studio-cold", label: "студия холодный", image: studioCold },
@@ -26,18 +35,8 @@ export const defaultBackgroundTiles: ConfigTile[] = [
   { id: "home", label: "дом", image: living },
   { id: "party", label: "вечеринка", image: party },
   { id: "street-city", label: "улица (город)", image: street },
-  { id: "restaurant", label: "ресторан", tint: "#6b5344" },
   { id: "beach", label: "пляж", image: beach },
   { id: "city-dusk", label: "город сумерки", image: cityDusk },
-  { id: "museum", label: "музей", tint: "#8a8578" },
-  { id: "pajama", label: "пижамная вечеринка", tint: "#f0e6dc" },
-  { id: "buffet", label: "фуршет", tint: "#ebe4d8" },
-  { id: "forest-trail", label: "лесная тропа", tint: "#4a6b4a" },
-  { id: "winter-forest", label: "зимний лес", tint: "#c8d4dc" },
-  { id: "gym", label: "тренажёрный зал", tint: "#5a5a62" },
-  { id: "school", label: "школа", tint: "#c4b8a8" },
-  { id: "sports", label: "спортивная площадка", tint: "#7a9a6a" },
-  { id: "winter-street", label: "зимняя улица", tint: "#9aacbc" },
 ];
 
 export const defaultAnimatePoseTiles: ConfigTile[] = [

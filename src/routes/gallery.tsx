@@ -17,7 +17,7 @@ function GalleryPage() {
   const { screen: screenParam, phase } = useSearch({
     from: "/gallery",
   });
-  const [overrides] = useWidgetOverrides();
+  const [overrides, , , overridesReady] = useWidgetOverrides();
   const previewScreen = screenParam ?? "start-page";
 
   const filteredScreens =
@@ -76,7 +76,14 @@ function GalleryPage() {
         <div className="flex justify-center lg:justify-start lg:sticky lg:top-8 self-start">
           <div className="w-[375px] shrink-0">
             <WidgetConfigProvider config={overrides}>
-              <Widget key={previewScreen} initialScreen={previewScreen} />
+              {overridesReady ? (
+                <Widget key={previewScreen} initialScreen={previewScreen} />
+              ) : (
+                <div
+                  aria-hidden
+                  className="w-[375px] h-[812px] rounded-[36px] bg-white"
+                />
+              )}
             </WidgetConfigProvider>
           </div>
         </div>
